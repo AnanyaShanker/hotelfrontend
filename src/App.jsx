@@ -4,6 +4,9 @@ import Signup from "./components/Signup";
 import { Navigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./routes/PrivateRoute";
+import React from "react";
+
+
 
 function App() {
   return (
