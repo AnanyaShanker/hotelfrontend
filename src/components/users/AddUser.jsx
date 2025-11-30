@@ -11,7 +11,7 @@ export default function AddUser() {
     password: "",
     notes: "",
     status: "active",
-    securityQuestions: "",
+    securityQuestion: "",
     securityAnswer: "",
   });
 
@@ -162,15 +162,15 @@ export default function AddUser() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Security Question */}
               <div>
-                <label htmlFor="securityQuestions" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                <label htmlFor="securityQuestion" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
                   Security Question
                 </label>
                 <input
-                  id="securityQuestions"
-                  name="securityQuestions"
+                  id="securityQuestion"
+                  name="securityQuestion"
                   type="text"
                   required
-                  value={form.securityQuestions}
+                  value={form.securityQuestion}
                   onChange={handleChange}
                   className="appearance-none block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
                   placeholder="Your pet's name?"

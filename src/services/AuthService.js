@@ -1,26 +1,27 @@
-import axios from "axios";
-
-const BASE_URL = "http://localhost:9193/api/users";
+import axios from "../api/axiosConfig";
 
 export const loginUser = async (email, password) => {
-  return axios.post(`${BASE_URL}/login`, { email, password });
+  return axios.post("/api/users/login", { email, password }, {
+    skipAuth: true // Don't send token for login
+  });
 };
-// FORGOT PASSWORD (still in AuthController)
+
+// FORGOT PASSWORD
 export const getSecurityQuestion = (email) => {
-    return axios.post(`http://localhost:9193/api/auth/forgot-password`, { email });
-   };
-   
-   // RESET PASSWORD (still in AuthController)
-   // api.js
+  return axios.post("/api/auth/forgot-password", { email }, {
+    skipAuth: true // Public endpoint
+  });
+};
 
-
+// RESET PASSWORD
 export const resetPassword = (email, securityAnswer, newPassword) => {
-  return axios.post("http://localhost:9193/api/auth/reset-password", {
+  return axios.post("/api/auth/reset-password", {
     email,
-    securityAnswer,   // ✅ correct field name
-    newPassword          // ✅ backend expects "newPassword"
+    securityAnswer,
+    newPassword
   }, {
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    skipAuth: true // Public endpoint
   });
 };
 
