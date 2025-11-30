@@ -1,31 +1,44 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+ 
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import { Navigate } from "react-router-dom";
-import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./routes/PrivateRoute";
-import React from "react";
-
-
-
+ 
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Gallery from "./pages/Gallery";
+ 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-  <Route path="/" element={<Navigate to="/login" />} />
-  <Route path="/login" element={<Login />} />
-  <Route path="/signup" element={<Signup />} />
-  <Route
-    path="/dashboard"
-    element={
-      <PrivateRoute>
-        <Dashboard />
-      </PrivateRoute>
-    }
-  />
-</Routes>
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+ 
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        //<Route path="/dashboard" element={<Dashboard />} />
+ 
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+ 
+        {/* Direct routes for Home and Gallery */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/gallery" element={<Gallery />} />
+      </Routes>
     </BrowserRouter>
   );
+ 
 }
 
 export default App;
