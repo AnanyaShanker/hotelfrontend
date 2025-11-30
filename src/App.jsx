@@ -1,44 +1,48 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import React from "react";
- 
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import PrivateRoute from "./routes/PrivateRoute";
- 
+
+import Login from "./components/auth/Login";
+import UsersList from "./components/users/UsersList";
+import AddUser from "./components/users/AddUser";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ForgotPassword from "./components/auth/ForgotPassword";
+
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
+import FeedbackForm from "./pages/FeedbackForm";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Render Home at root */}
-        <Route path="/" element={<Home />} />
+export default function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/add-user" element={<AddUser />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/feedback" element={<FeedbackForm />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/gallery" element={<Gallery />} />
 
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-        //<Route path="/dashboard" element={<Dashboard />} />
- 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
- 
-        {/* Direct routes for Home and Gallery */}
-        <Route path="/home" element={<Home />} />
-        <Route path="/gallery" element={<Gallery />} />
-      </Routes>
-    </BrowserRouter>
-  );
- 
+                {/* Protected routes */}
+                <Route
+                    path="/users"
+                    element={
+                        <ProtectedRoute>
+                            <UsersList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
+    );
 }
-
-export default App;
