@@ -13,13 +13,13 @@ import Footer from "../components/Footer";
  */
 export default function PublicLayout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[linear-gradient(180deg,#f8fafc, #ffffff)]">
+    <div className="min-h-screen flex flex-col bg-[linear-gradient(180deg,#f8fafc, #ffffff)] animate-page-load">
       <RoleAwareNavbar />
 
       {/* Spacer: equal to navbar height to prevent content from hiding under the fixed header */}
       <div className="h-[72px]" aria-hidden="true" />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-10">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-10 animate-fade-in">
         {children}
       </main>
 
