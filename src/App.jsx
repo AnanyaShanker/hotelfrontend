@@ -1,46 +1,48 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React from "react";
- 
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import PrivateRoute from "./routes/PrivateRoute";
- 
+
+import Login from "./components/auth/Login";
+import UsersList from "./components/users/UsersList";
+import AddUser from "./components/users/AddUser";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ForgotPassword from "./components/auth/ForgotPassword";
+
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
- 
-function App() {
+
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to login */}
-        <Route path="/" element={<Navigate to="/login" />} />
- 
         {/* Public routes */}
+        <Route path="/" element={<Login />} /> {/* Login route */}
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/add-user" element={<AddUser />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/feedback" element={<FeedbackForm />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/gallery" element={<Gallery />} />
 
-        //<Route path="/dashboard" element={<Dashboard />} />
- 
-        <Route path="/feedback" element={<FeedbackForm/>} />
         {/* Protected routes */}
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UsersList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <Dashboard />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
- 
-        {/* Direct routes for Home and Gallery */}
-        <Route path="/home" element={<Home />} />
-        <Route path="/gallery" element={<Gallery />} />
       </Routes>
     </BrowserRouter>
   );
- 
 }
-
-export default App;
