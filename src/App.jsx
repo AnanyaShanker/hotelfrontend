@@ -8,6 +8,7 @@ import PrivateRoute from "./routes/PrivateRoute";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
+import FeedbackForm from "./pages/FeedbackForm";
  
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
 
         //<Route path="/dashboard" element={<Dashboard />} />
  
+        <Route path="/feedback" element={<FeedbackForm/>} />
         {/* Protected routes */}
         <Route
           path="/dashboard"
