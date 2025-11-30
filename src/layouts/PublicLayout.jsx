@@ -1,6 +1,6 @@
 
 
-import Navbar from "../components/Navbar";
+import RoleAwareNavbar from "../components/RoleAwareNavbar";
 import Footer from "../components/Footer";
 
 /**
@@ -14,7 +14,7 @@ import Footer from "../components/Footer";
 export default function PublicLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-[linear-gradient(180deg,#f8fafc, #ffffff)]">
-      <Navbar />
+      <RoleAwareNavbar />
 
       {/* Spacer: equal to navbar height to prevent content from hiding under the fixed header */}
       <div className="h-[72px]" aria-hidden="true" />

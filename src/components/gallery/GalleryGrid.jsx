@@ -38,17 +38,27 @@ export default function GalleryGrid() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const delayClasses = [
+    'animate-delay-100',
+    'animate-delay-200',
+    'animate-delay-300',
+    'animate-delay-400',
+    'animate-delay-500',
+    'animate-delay-600',
+  ];
+
   return (
     <>
       <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
         {images.map((item, index) => (
-          <GalleryCard
-            key={index}
-            image={item.src}
-            title={item.title}
-            desc={item.desc}
-            onClick={() => setSelectedImage(item.src)}
-          />
+          <div key={index} className={`animate-fade-in-up ${delayClasses[index]}`}>
+            <GalleryCard
+              image={item.src}
+              title={item.title}
+              desc={item.desc}
+              onClick={() => setSelectedImage(item.src)}
+            />
+          </div>
         ))}
       </div>
 

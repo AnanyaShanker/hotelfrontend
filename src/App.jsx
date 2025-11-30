@@ -8,14 +8,14 @@ import PrivateRoute from "./routes/PrivateRoute";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
- 
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to login */}
-        <Route path="/" element={<Navigate to="/login" />} />
- 
+        {/* Render Home at root */}
+        <Route path="/" element={<Home />} />
+
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

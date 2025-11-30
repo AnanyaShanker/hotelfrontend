@@ -4,30 +4,57 @@ import GalleryGrid from "../components/gallery/GalleryGrid";
 export default function Gallery() {
   return (
     <PublicLayout>
-       {/* ===== PREMIUM HERO HEADER ===== */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
-
-        {/* Decorative Blur Orbs */}
-        <div className="absolute -top-20 -left-20 w-96 h-96 bg-purple-700/30 rounded-full blur-3xl" />
-        <div className="absolute top-20 -right-20 w-96 h-96 bg-pink-700/20 rounded-full blur-3xl" />
-
+       {/* ===== MINIMALIST HERO HEADER ===== */}
+      <div className="relative overflow-hidden bg-neutral-800 pt-32 pb-20">
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 text-center text-white">
-          {/* <span className="inline-block mb-4 px-6 py-2 text-xs uppercase tracking-widest bg-white/10 rounded-full border border-white/20 backdrop-blur">
-            Explore Luxury
-          </span> */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white">
+          <span className="inline-block mb-8 text-xs uppercase tracking-widest text-neutral-400 font-light">
+            Visual Experience
+          </span>
 
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-            Moments Captured in <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Elegance</span>
+          <h1 className="text-4xl md:text-6xl font-light mb-8 tracking-wide leading-tight">
+            Moments Captured in
+            <br />
+            <span className="text-white/90">
+              Elegance
+            </span>
           </h1>
 
-          <p className="max-w-2xl mx-auto text-gray-300 text-sm md:text-base">
+          <p className="max-w-3xl mx-auto text-neutral-300 text-base md:text-lg font-light leading-relaxed mb-12">
             Discover the beauty of our rooms, interiors, fine dining, and world-class amenities through our visual showcase.
           </p>
+
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-12 mt-16 border-t border-b border-neutral-700 py-12">
+            <div className="text-center animate-fade-in animate-delay-100">
+              <div className="text-3xl font-light mb-2">500+</div>
+              <div className="text-xs text-neutral-300 uppercase tracking-widest font-light">Photos</div>
+            </div>
+            <div className="text-center animate-fade-in animate-delay-200">
+              <div className="text-3xl font-light mb-2">50+</div>
+              <div className="text-xs text-neutral-300 uppercase tracking-widest font-light">Locations</div>
+            </div>
+            <div className="text-center animate-fade-in animate-delay-300">
+              <div className="text-3xl font-light mb-2">4.9★</div>
+              <div className="text-xs text-neutral-300 uppercase tracking-widest font-light">Rating</div>
+            </div>
+          </div>
         </div>
       </div>
+
       {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
+      <div className="max-w-7xl mx-auto px-6 py-24">
+        <div className="text-center mb-20 animate-fade-in">
+          <span className="inline-block text-xs uppercase tracking-widest text-neutral-600 font-light mb-6">
+            Our Collection
+          </span>
+          <h2 className="text-3xl md:text-4xl font-light mb-6 text-neutral-900 tracking-wide">
+            Explore Our Gallery
+          </h2>
+          <p className="text-neutral-700 max-w-2xl mx-auto font-light">
+            Click on any image to view in full screen and discover the details
+          </p>
+        </div>
         <GalleryGrid />
       </div>
     </PublicLayout>
