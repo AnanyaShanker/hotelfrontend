@@ -12,7 +12,7 @@ export default function Home() {
     <PublicLayout>
       {/* WELCOME BANNER FOR LOGGED IN USERS */}
       {isAuthenticated && user && (
-        <section className="mb-16 mt-28">
+        <section className="mb-16 mt-28 animate-fade-in">
           <div className="relative overflow-hidden bg-neutral-50 border border-neutral-200 p-10">
             <div className="flex items-center justify-between flex-wrap gap-6">
               <div>
@@ -57,7 +57,7 @@ export default function Home() {
       )}
 
       {/* HERO CAROUSEL */}
-      <section className="mb-24">
+      <section className="mb-24 animate-fade-in">
         <HeroCarousel />
       </section>
 
@@ -224,7 +224,7 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION - Minimalist */}
-      <section className="mb-24">
+      <section className="mb-24 animate-fade-in-up">
         <div className="relative overflow-hidden bg-neutral-800 p-20 text-center text-white">
           <div className="relative z-10">
             <span className="inline-block text-xs uppercase tracking-widest text-neutral-400 font-light mb-6">
@@ -255,7 +255,7 @@ export default function Home() {
       </section>
 
       {/* FEATURED IMAGE */}
-      <section className="mb-24">
+      <section className="mb-24 animate-fade-in-up">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div>
             <span className="inline-block text-xs uppercase tracking-widest text-neutral-600 font-light mb-6">

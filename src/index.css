@@ -108,6 +108,38 @@
   animation-fill-mode: backwards;
 }
 
+/* Page load animation - subtle zoom in */
+@keyframes page-load {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-page-load {
+  animation: page-load 0.8s ease-out;
+}
+
+/* Slide in from bottom with fade */
+@keyframes slide-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-fade-up {
+  animation: slide-fade-up 0.9s ease-out;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

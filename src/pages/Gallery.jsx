@@ -8,11 +8,11 @@ export default function Gallery() {
       <div className="relative overflow-hidden bg-neutral-800 pt-32 pb-20">
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white">
-          <span className="inline-block mb-8 text-xs uppercase tracking-widest text-neutral-400 font-light">
+          <span className="inline-block mb-8 text-xs uppercase tracking-widest text-neutral-400 font-light animate-fade-in">
             Visual Experience
           </span>
 
-          <h1 className="text-4xl md:text-6xl font-light mb-8 tracking-wide leading-tight">
+          <h1 className="text-4xl md:text-6xl font-light mb-8 tracking-wide leading-tight animate-fade-in animate-delay-100">
             Moments Captured in
             <br />
             <span className="text-white/90">
@@ -20,7 +20,7 @@ export default function Gallery() {
             </span>
           </h1>
 
-          <p className="max-w-3xl mx-auto text-neutral-300 text-base md:text-lg font-light leading-relaxed mb-12">
+          <p className="max-w-3xl mx-auto text-neutral-300 text-base md:text-lg font-light leading-relaxed mb-12 animate-fade-in animate-delay-200">
             Discover the beauty of our rooms, interiors, fine dining, and world-class amenities through our visual showcase.
           </p>
 

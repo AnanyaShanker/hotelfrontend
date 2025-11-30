@@ -1,7 +1,7 @@
 export default function GalleryCard({ image, title, desc, onClick }) {
   return (
     <div
-      className="group cursor-pointer border border-neutral-200 hover:border-neutral-300 transition-all bg-white overflow-hidden"
+      className="group cursor-pointer border border-neutral-200 hover:border-neutral-300 transition-all duration-300 bg-white overflow-hidden hover:shadow-lg"
       onClick={onClick}
     >
       {/* IMAGE */}
@@ -37,7 +37,7 @@ export default function GalleryCard({ image, title, desc, onClick }) {
 
       {/* INFO */}
       <div className="p-6 border-t border-neutral-200">
-        <h3 className="text-base font-light mb-2 text-neutral-900 tracking-wide uppercase text-xs">
+        <h3 className="text-xs font-light mb-2 text-neutral-900 tracking-wide uppercase">
           {title}
         </h3>
         <p className="text-neutral-700 text-sm font-light">{desc}</p>
