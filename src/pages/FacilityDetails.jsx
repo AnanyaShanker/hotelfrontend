@@ -29,6 +29,8 @@ export default function FacilityDetails() {
 
   const handleBookNow = () => {
     if (!isAuthenticated) {
+      // Save where user wanted to go so we can redirect after login
+      localStorage.setItem("returnUrl", `/book-facility/${id}`);
       navigate("/login");
       return;
     }

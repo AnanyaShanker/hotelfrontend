@@ -24,6 +24,8 @@ export default function BookFacility() {
 
   useEffect(() => {
     if (!isAuthenticated) {
+      // Save current booking page URL so we can return here after login
+      localStorage.setItem("returnUrl", window.location.pathname);
       navigate("/login");
       return;
     }

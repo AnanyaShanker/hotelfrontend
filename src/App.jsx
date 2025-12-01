@@ -16,11 +16,6 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
-// Role-based dashboards
-import CustomerDashboard from "./components/dashboard/CustomerDashboard";
-import StaffDashboard from "./components/dashboard/StaffDashboard";
-import ManagerDashboard from "./components/dashboard/ManagerDashboard";
-import AdminDashboard from "./components/dashboard/AdminDashboard";
 
 export default function App() {
     return (
