@@ -44,7 +44,7 @@ export default function Home() {
                 )}
                 {isCustomer() && (
                   <button
-                    onClick={() => navigate("/my-bookings")}
+                    onClick={() => navigate("/my-facility-bookings")}
                     className="px-8 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
                   >
                     My Bookings
@@ -144,6 +144,16 @@ export default function Home() {
             />
           </div>
         </div>
+
+        {/* View All Facilities Button */}
+        <div className="text-center mt-12">
+          <button
+            onClick={() => navigate("/facilities")}
+            className="px-10 py-4 border border-neutral-300 text-neutral-800 font-light text-sm tracking-wider uppercase hover:border-neutral-400 hover:bg-neutral-50 transition"
+          >
+            View All Facilities
+          </button>
+        </div>
       </section>
 
       {/* TESTIMONIALS */}
@@ -221,6 +231,16 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* View Gallery Button */}
+        <div className="text-center mt-12">
+          <button
+            onClick={() => navigate("/gallery")}
+            className="px-10 py-4 border border-neutral-300 text-neutral-800 font-light text-sm tracking-wider uppercase hover:border-neutral-400 hover:bg-neutral-50 transition"
+          >
+            View Our Gallery
+          </button>
+        </div>
       </section>
 
       {/* CTA SECTION - Minimalist */}
@@ -244,7 +264,7 @@ export default function Home() {
                 Browse Facilities
               </button>
               <button
-                onClick={() => navigate("/my-bookings")}
+                onClick={() => navigate("/my-facility-bookings")}
                 className="px-10 py-4 border border-white text-white font-light text-sm tracking-wider uppercase hover:bg-white/10 transition"
               >
                 My Bookings
@@ -283,10 +303,10 @@ export default function Home() {
               </li>
             </ul>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/facilities")}
               className="px-10 py-4 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
             >
-              Book Your Stay
+              Explore Facilities
             </button>
           </div>
           <div className="relative group">

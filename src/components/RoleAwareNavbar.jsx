@@ -53,7 +53,7 @@ export default function RoleAwareNavbar() {
 
           {isAuthenticated && isCustomer() && (
             <a
-              href="/my-bookings"
+              href="/my-facility-bookings"
               className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
             >
               My Bookings
