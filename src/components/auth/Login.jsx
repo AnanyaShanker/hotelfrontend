@@ -26,12 +26,18 @@ export default function Login() {
 
       setMsg("Login Successful. Redirecting...");
 
+      // Check if user came from booking page
+      const returnUrl = localStorage.getItem("returnUrl");
+
       setTimeout(() => {
-        if (user.roleId === 1) window.location.href = "/customer/dashboard";
-        else if (user.roleId === 2) window.location.href = "/staff/dashboard";
-        else if (user.roleId === 3) window.location.href = "/manager/dashboard";
-        else if (user.roleId === 4) window.location.href = "/admin/dashboard";
-        else window.location.href = "/home";
+        if (returnUrl) {
+          // User was trying to book - send them back to booking page
+          localStorage.removeItem("returnUrl");
+          window.location.href = returnUrl;
+        } else {
+          // Normal login - go to home
+          window.location.href = "/home";
+        }
       }, 1000);
 
     } catch {

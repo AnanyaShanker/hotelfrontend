@@ -16,11 +16,6 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
-// Role-based dashboards
-import CustomerDashboard from "./components/dashboard/CustomerDashboard";
-import StaffDashboard from "./components/dashboard/StaffDashboard";
-import ManagerDashboard from "./components/dashboard/ManagerDashboard";
-import AdminDashboard from "./components/dashboard/AdminDashboard";
 
 export default function App() {
     return (
@@ -55,40 +50,6 @@ export default function App() {
                     element={
                         <ProtectedRoute>
                             <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* Role-based dashboards */}
-                <Route
-                    path="/customer/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <CustomerDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/staff/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <StaffDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/manager/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <ManagerDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <AdminDashboard />
                         </ProtectedRoute>
                     }
                 />
