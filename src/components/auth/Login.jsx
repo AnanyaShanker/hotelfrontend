@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/AuthService";
+import { useAuth } from "../../context/AuthContext";
 import './Login.css';
 
 export default function Login() {
@@ -9,6 +9,7 @@ export default function Login() {
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,13 +17,13 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await loginUser(email, password);
-      const token = response.data.data.token;
-      const user = response.data.data.user;
+      const result = await login(email, password);
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("roleId", user.roleId);
-      localStorage.setItem("userName", user.name);
+      if (!result.success) {
+        setMsg(result.error || "Invalid email or password");
+        setLoading(false);
+        return;
+      }
 
       setMsg("Login Successful. Redirecting...");
 
@@ -33,15 +34,25 @@ export default function Login() {
         if (returnUrl) {
           // User was trying to book - send them back to booking page
           localStorage.removeItem("returnUrl");
-          window.location.href = returnUrl;
+          navigate(returnUrl);
         } else {
-          // Normal login - go to home
-          window.location.href = "/home";
+          // Role-based navigation
+          const roleId = result.user.roleId;
+          if (roleId === 4 || roleId === 3) {
+            // SUPERADMIN or MANAGER
+            navigate("/dashboard");
+          } else if (roleId === 2) {
+            // STAFF
+            navigate("/dashboard");
+          } else {
+            // CUSTOMER
+            navigate("/home");
+          }
         }
       }, 1000);
 
-    } catch {
-      setMsg("Invalid email or password");
+    } catch (error) {
+      setMsg("An error occurred. Please try again.");
       setLoading(false);
     }
   };

@@ -53,40 +53,6 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
-                {/* Role-based dashboards */}
-                <Route
-                    path="/customer/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <CustomerDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/staff/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <StaffDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/manager/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <ManagerDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <AdminDashboard />
-                        </ProtectedRoute>
-                    }
-                />
             </Routes>
         </BrowserRouter>
     );
