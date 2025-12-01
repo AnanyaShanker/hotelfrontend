@@ -58,6 +58,19 @@ export default function Facilities() {
     return icons[type] || "🏨";
   };
 
+  const formatFacilityType = (type) => {
+    const typeLabels = {
+      'SPA': 'Spa & Wellness',
+      'GYM': 'Fitness Center',
+      'POOL': 'Swimming Pool',
+      'BANQUET': 'Banquet Hall',
+      'MEETING_HALL': 'Meeting Room',
+      'RESTAURANT': 'Restaurant',
+      'OTHER': 'Other'
+    };
+    return typeLabels[type] || type;
+  };
+
   if (loading) {
     return (
       <PublicLayout>
@@ -131,7 +144,7 @@ export default function Facilities() {
                   </div>
                 )}
                 <div className="absolute top-4 right-4 bg-neutral-800 text-white px-4 py-2 text-xs uppercase tracking-wider font-light">
-                  {facility.type}
+                  {formatFacilityType(facility.type)}
                 </div>
               </div>
 

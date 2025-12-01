@@ -8,6 +8,7 @@ const publicEndpoints = [
   '/api/auth/login',
   '/api/users', // POST for signup
   '/api/auth/forgot-password',
+  '/api/auth/reset-password',
   '/facilities/all',
   '/facilities/',
 ];
@@ -16,22 +17,25 @@ axios.interceptors.request.use((config) => {
   console.log('🔍 Axios Request:', {
     method: config.method,
     url: config.url,
+    fullURL: config.baseURL + config.url,
     skipAuth: config.skipAuth,
     hasToken: !!localStorage.getItem("token")
   });
 
   // Check if this request should skip authentication
   if (config.skipAuth) {
-    console.log('✅ Skipping auth for this request');
+    console.log('✅ Skipping auth for this request (skipAuth flag)');
     return config;
   }
 
-  // Check if endpoint is public (for POST to /api/users - signup)
+  // Check if endpoint is public
   const isPublicEndpoint = publicEndpoints.some(endpoint => {
+    // Special case for POST to /api/users (signup)
     if (config.method === 'post' && config.url?.includes('/api/users')) {
-      return true; // Signup endpoint
+      return true;
     }
-    return config.url?.startsWith(endpoint);
+    // Check if URL starts with or includes the public endpoint
+    return config.url?.startsWith(endpoint) || config.url?.includes(endpoint);
   });
 
   if (isPublicEndpoint) {
