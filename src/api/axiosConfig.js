@@ -11,6 +11,7 @@ const publicEndpoints = [
   '/api/auth/reset-password',
   '/facilities/all',
   '/facilities/',
+  
 ];
 
 axios.interceptors.request.use((config) => {

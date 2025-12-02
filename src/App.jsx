@@ -19,6 +19,8 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
+import BookRoom from "./pages/BookRoom";
+
 
 export default function App() {
     return (
@@ -38,6 +40,10 @@ export default function App() {
                 <Route path="/facility/:id" element={<FacilityDetails />} />
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
+
+
+                {/*Room Booking routes*/}
+                <Route path="/book-room" element={<BookRoom />} />
 
                 {/* Protected routes */}
                 <Route
