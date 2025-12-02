@@ -34,10 +34,12 @@ function Signup() {
     });
 
     try {
-      const res = await axios.post("/api/users", data, {
+      await axios.post("/api/users", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Signup successful! User ID: " + res.data.data.userId);
+      alert("Signup successful! Please login to continue.");
+      // Keep returnUrl in localStorage so it's available after login
+      // No need to remove it - the login page will use it
       navigate("/login");
     } catch (err) {
       alert("Error: " + (err.response?.data?.message || "Signup failed"));
