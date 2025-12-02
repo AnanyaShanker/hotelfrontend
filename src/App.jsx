@@ -7,6 +7,9 @@ import AddUser from "./components/users/AddUser";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
 
+
+
+
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
@@ -42,6 +45,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+                
             </Routes>
         </BrowserRouter>
     );
