@@ -15,9 +15,16 @@ function Signup() {
     roleId: "2",
   });
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    // Clear error when user starts typing in email field
+    if (e.target.name === "email" && errorMsg) {
+      setErrorMsg("");
+    }
+
     if (e.target.type === "file") {
       setFormData({ ...formData, [e.target.name]: e.target.files[0] });
     } else {
@@ -28,6 +35,9 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
@@ -37,12 +47,23 @@ function Signup() {
       await axios.post("/api/users", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Signup successful! Please login to continue.");
+      setSuccessMsg("Account created successfully! Redirecting to login...");
       // Keep returnUrl in localStorage so it's available after login
-      // No need to remove it - the login page will use it
-      navigate("/login");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      alert("Error: " + (err.response?.data?.message || "Signup failed"));
+      // Handle duplicate email error specifically
+      const errorMessage = err.response?.data?.message || "";
+
+      if (err.response?.status === 409 ||
+          errorMessage.toLowerCase().includes("duplicate") ||
+          errorMessage.toLowerCase().includes("already exists") ||
+          errorMessage.toLowerCase().includes("email") && errorMessage.toLowerCase().includes("taken")) {
+        setErrorMsg("This email address is already registered. Please use a different email or login if you already have an account.");
+      } else if (err.response?.status === 400) {
+        setErrorMsg(errorMessage || "Please check your information and try again.");
+      } else {
+        setErrorMsg(errorMessage || "Signup failed. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -67,6 +88,47 @@ function Signup() {
             Join HotelEase for premium luxury stays
           </p>
         </div>
+
+        {/* Error Message */}
+        {errorMsg && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-fade-in">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-800 font-medium">{errorMsg}</p>
+                {errorMsg.includes("already registered") && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/login")}
+                    className="mt-2 text-xs text-red-700 underline hover:text-red-900"
+                  >
+                    Go to Login →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {successMsg && (
+          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg animate-fade-in">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-green-800 font-medium">{successMsg}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {/* Grid Layout for Inputs */}

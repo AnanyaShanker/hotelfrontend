@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePayment } from '../hooks/usePayment';
+import { useAuth } from '../context/AuthContext';
 import PublicLayout from '../layouts/PublicLayout';
 
 export default function PaymentCheckout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { processing, error, processPayment, clearError } = usePayment();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   const { bookingType, bookingId, amount, bookingDetails } = location.state || {};
+
+  useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const [selectedMethod, setSelectedMethod] = useState('UPI');
 

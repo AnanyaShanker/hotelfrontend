@@ -204,9 +204,28 @@ const fetchRoomTypes = async () => {
     };
 
     try {
-      await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
-      setMessage("Booking confirmed successfully!");
-      setTimeout(() => navigate("/my-room-bookings"), 1500);
+      const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
+      setMessage("Booking confirmed successfully! Redirecting to payment...");
+
+      // Get booking ID from response
+      const bookingId = response.bookingId || response.data?.bookingId;
+      const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
+
+      setTimeout(() => {
+        navigate(`/payment/room/${bookingId}`, {
+          state: {
+            bookingType: 'room',
+            bookingId: bookingId,
+            amount: totalPrice,
+            bookingDetails: {
+              roomNumber: selectedRoom?.roomNumber || 'N/A',
+              checkIn: formData.checkInDate,
+              checkOut: formData.checkOutDate,
+              numberOfGuests: formData.quantity
+            }
+          }
+        });
+      }, 1500);
     } catch (error) {
       console.error("Booking error:", error);
       const errorMsg = error.response?.data || "Booking failed. Please try again.";
