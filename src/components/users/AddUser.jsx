@@ -160,23 +160,28 @@ export default function AddUser() {
               Security Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Security Question */}
               <div>
-                <label htmlFor="securityQuestion" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
-                  Security Question
-                </label>
-                <input
-                  id="securityQuestion"
-                  name="securityQuestion"
-                  type="text"
-                  required
-                  value={form.securityQuestion}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
-                  placeholder="Your pet's name?"
-                />
-              </div>
-
+  <label
+    htmlFor="securityQuestion"
+    className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
+  >
+    Security Question
+  </label>
+  <select
+    id="securityQuestion"
+    name="securityQuestion"
+    required
+    value={form.securityQuestion}
+    onChange={handleChange}
+    className="appearance-none block w-full px-4 py-3 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
+  >
+    <option value="">Select a question</option>
+    <option value="petName">What is your pet's name?</option>
+    <option value="birthCity">In which city were you born?</option>
+    <option value="motherMaiden">What is your mother's maiden name?</option>
+    <option value="firstSchool">What was the name of your first school?</option>
+  </select>
+</div>
               {/* Security Answer */}
               <div>
                 <label htmlFor="securityAnswer" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
