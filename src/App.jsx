@@ -17,6 +17,9 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
+// Room Booking pages
+import BookRoom from "./pages/BookRoom";
+
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -29,13 +32,6 @@ import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
-import BookRoom from "./pages/BookRoom";
-
-// Payment imports
-import PaymentCheckout from "./pages/PaymentCheckout";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentFailed from "./pages/PaymentFailed";
-import PaymentHistory from "./pages/PaymentHistory";
 
 export default function App() {
     return (

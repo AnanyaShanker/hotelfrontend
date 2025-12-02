@@ -11,7 +11,7 @@ export default function BookFacility() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     bookingDate: "",
@@ -23,6 +23,9 @@ export default function BookFacility() {
   });
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking authentication
+    if (authLoading) return;
+
     if (!isAuthenticated) {
       // Save current booking page URL so we can return here after login
       localStorage.setItem("returnUrl", window.location.pathname);
@@ -33,7 +36,7 @@ export default function BookFacility() {
       fetchFacility();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, authLoading]);
 
   const fetchFacility = async () => {
     try {
