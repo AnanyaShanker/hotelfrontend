@@ -29,7 +29,10 @@ export default function BookFacility() {
       navigate("/login");
       return;
     }
-    fetchFacility();
+    if (id) {
+      fetchFacility();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isAuthenticated]);
 
   const fetchFacility = async () => {
@@ -103,11 +106,28 @@ export default function BookFacility() {
     };
 
     try {
-      await createFacilityBooking(bookingRequest);
-      setMessage("Booking confirmed successfully! Redirecting...");
+      const response = await createFacilityBooking(bookingRequest);
+      setMessage("Booking confirmed successfully! Redirecting to payment...");
+
+      // Get booking ID from response
+      const bookingId = response.facilityBookingId;
+      const totalPrice = calculatePrice();
+
       setTimeout(() => {
-        navigate("/my-facility-bookings");
-      }, 2000);
+        navigate(`/payment/facility/${bookingId}`, {
+          state: {
+            bookingType: 'facility',
+            bookingId: bookingId,
+            amount: totalPrice,
+            bookingDetails: {
+              facilityName: facility.name,
+              date: formData.bookingDate,
+              time: `${formData.startTime} - ${formData.endTime}`,
+              quantity: formData.quantity
+            }
+          }
+        });
+      }, 1500);
     } catch (error) {
       console.error("Booking error:", error);
       const errorMsg = error.response?.data || "Booking failed. Please try again.";
