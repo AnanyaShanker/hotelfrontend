@@ -14,6 +14,11 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
+import Facilities from "./pages/Facilities";
+import FacilityDetails from "./pages/FacilityDetails";
+import BookFacility from "./pages/BookFacility";
+import MyFacilityBookings from "./pages/MyFacilityBookings";
+
 
 export default function App() {
     return (
@@ -27,6 +32,12 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/feedback" element={<FeedbackForm />} />
                 <Route path="/gallery" element={<Gallery />} />
+
+                {/* Facility routes */}
+                <Route path="/facilities" element={<Facilities />} />
+                <Route path="/facility/:id" element={<FacilityDetails />} />
+                <Route path="/book-facility/:id" element={<BookFacility />} />
+                <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
                 {/* Protected routes */}
                 <Route
