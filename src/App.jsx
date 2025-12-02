@@ -21,6 +21,13 @@ import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
+import BookRoom from "./pages/BookRoom";
+
+// Payment imports
+import PaymentCheckout from "./pages/PaymentCheckout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
+import PaymentHistory from "./pages/PaymentHistory";
 
 export default function App() {
     return (
@@ -42,11 +49,20 @@ export default function App() {
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
+                {/* Room Booking routes */}
+                <Route path="/book-room" element={<BookRoom />} />
+
                 {/* Payment routes */}
                 <Route path="/payment/:bookingType/:bookingId" element={<PaymentCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/failed" element={<PaymentFailed />} />
                 <Route path="/my-payments" element={<PaymentHistory />} />
+
+                {/* Report routes */}
+                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
+                <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
+                <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
+                <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
 
                 {/* Protected routes */}
                 <Route
@@ -65,11 +81,6 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
-                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport/>} />
-                <Route path="/reports/housekeeping" element={<HousekeepingReport/>} />
-                <Route path="/reports/room-revenue" element={<RoomRevenueReport/>} />
-                <Route path="/reports/feedback" element={<GuestFeedbackReport/>} />
             </Routes>
         </BrowserRouter>
     );
