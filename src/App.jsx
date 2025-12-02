@@ -17,6 +17,12 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
+<<<<<<< HEAD
+=======
+// Room Booking pages
+import BookRoom from "./pages/BookRoom";
+
+>>>>>>> f9bffd61b1e6a4cfcc1efeb79e9ce5f5072385e7
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -50,11 +56,20 @@ export default function App() {
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
+                {/* Room Booking routes */}
+                <Route path="/book-room" element={<BookRoom />} />
+
                 {/* Payment routes */}
                 <Route path="/payment/:bookingType/:bookingId" element={<PaymentCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/failed" element={<PaymentFailed />} />
                 <Route path="/my-payments" element={<PaymentHistory />} />
+
+                {/* Report routes */}
+                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
+                <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
+                <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
+                <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
 
                 {/* Protected routes */}
                 <Route
@@ -73,11 +88,6 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
-                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport/>} />
-                <Route path="/reports/housekeeping" element={<HousekeepingReport/>} />
-                <Route path="/reports/room-revenue" element={<RoomRevenueReport/>} />
-                <Route path="/reports/feedback" element={<GuestFeedbackReport/>} />
             </Routes>
         </BrowserRouter>
     );

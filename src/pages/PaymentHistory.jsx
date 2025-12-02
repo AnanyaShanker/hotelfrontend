@@ -5,18 +5,27 @@ import { useAuth } from '../context/AuthContext';
 import PublicLayout from '../layouts/PublicLayout';
 
 export default function PaymentHistory() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, success, failed, pending
 
   useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
     if (user && user.userId) {
       fetchPayments();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, isAuthenticated, authLoading]);
 
   const fetchPayments = async () => {
     setLoading(true);

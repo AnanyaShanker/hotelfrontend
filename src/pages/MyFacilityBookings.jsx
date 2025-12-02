@@ -11,15 +11,18 @@ export default function MyFacilityBookings() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking authentication
+    if (authLoading) return;
+
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
     fetchBookings();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading, navigate]);
 
   const fetchBookings = async () => {
     try {
