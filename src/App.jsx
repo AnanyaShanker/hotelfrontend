@@ -2,13 +2,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import React from "react";
 
 import Login from "./components/auth/Login";
+import Signup from "./components/Signup";
 import UsersList from "./components/users/UsersList";
 import AddUser from "./components/users/AddUser";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
-
-
-
 
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -18,9 +16,18 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
+import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
+import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
+import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
+import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
 import BookRoom from "./pages/BookRoom";
 
+// Payment imports
+import PaymentCheckout from "./pages/PaymentCheckout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
+import PaymentHistory from "./pages/PaymentHistory";
 
 export default function App() {
     return (
@@ -30,6 +37,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
                 <Route path="/add-user" element={<AddUser />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/feedback" element={<FeedbackForm />} />
@@ -41,9 +49,20 @@ export default function App() {
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
-
-                {/*Room Booking routes*/}
+                {/* Room Booking routes */}
                 <Route path="/book-room" element={<BookRoom />} />
+
+                {/* Payment routes */}
+                <Route path="/payment/:bookingType/:bookingId" element={<PaymentCheckout />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/failed" element={<PaymentFailed />} />
+                <Route path="/my-payments" element={<PaymentHistory />} />
+
+                {/* Report routes */}
+                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
+                <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
+                <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
+                <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
 
                 {/* Protected routes */}
                 <Route
@@ -62,7 +81,6 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-                
             </Routes>
         </BrowserRouter>
     );
