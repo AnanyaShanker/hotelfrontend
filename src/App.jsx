@@ -15,6 +15,10 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
+import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
+import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
+import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
+import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
 
 export default function App() {
@@ -53,6 +57,11 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                <Route path="/reports/room-occupancy" element={<RoomOccupancyReport/>} />
+                <Route path="/reports/housekeeping" element={<HousekeepingReport/>} />
+                <Route path="/reports/room-revenue" element={<RoomRevenueReport/>} />
+                <Route path="/reports/feedback" element={<GuestFeedbackReport/>} />
             </Routes>
         </BrowserRouter>
     );
