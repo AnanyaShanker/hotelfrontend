@@ -226,10 +226,10 @@ const fetchRoomTypes = async (typeId) => {
         {/* Header */}
         <div className="mb-12">
           <button
-            onClick={() => navigate("/rooms")}
+            onClick={() => navigate("/home")}
             className="text-xs uppercase tracking-wider text-neutral-600 hover:text-neutral-900 transition font-light mb-6"
           >
-            ← Back to Rooms
+            ← Back to Home
           </button>
 
           <div className="text-center">

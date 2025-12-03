@@ -33,7 +33,7 @@ import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
 //Dashboards
-import StaffDashboard from "./components/dashboard/StaffDashboard";
+
 
 
 export default function App() {
@@ -88,7 +88,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
+{/* 
                <Route
   path="/staff-dashboard"
   element={
@@ -96,7 +96,7 @@ export default function App() {
       <StaffDashboard staffId={1}/>
     </ProtectedRoute>
   }
-/>
+/> */}
 
                 
             </Routes>
