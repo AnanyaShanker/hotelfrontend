@@ -27,6 +27,13 @@ export default function BookRoom() {
     quantity: 1,
   });
 
+  // Update customerId when user loads
+  useEffect(() => {
+    if (user?.userId && formData.customerId !== user.userId) {
+      setFormData(prev => ({ ...prev, customerId: user.userId }));
+    }
+  }, [user, formData.customerId]);
+
   const [roomTypes, setRoomTypes] = useState([]); // dropdown of types
   const [branches, setBranches] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -193,25 +200,67 @@ const fetchRoomTypes = async () => {
       setSubmitting(false);
       return;
     }
+    if (!formData.customerId || !user?.userId) {
+      setMessage("User not authenticated. Please login again.");
+      setSubmitting(false);
+      navigate('/login');
+      return;
+    }
+
+    // Format dates for backend (ensure ISO datetime format)
+    const checkInDateTime = new Date(formData.checkInDate + 'T14:00:00'); // 2pm check-in
+    const checkOutDateTime = new Date(formData.checkOutDate + 'T12:00:00'); // 12pm check-out
 
     const bookingRequest = {
-      customerId: formData.customerId,
+      customerId: parseInt(formData.customerId),
       branchId: parseInt(formData.branchId),
       roomId: parseInt(formData.roomId),
-      checkInDate: formData.checkInDate,
-      checkOutDate: formData.checkOutDate,
+      checkInDate: checkInDateTime.toISOString().split('.')[0], // Remove milliseconds
+      checkOutDate: checkOutDateTime.toISOString().split('.')[0],
+      totalPrice: parseFloat(totalPrice),
+      paymentStatus: 'PENDING',
+      bookingStatus: 'CONFIRMED',
       notes: formData.notes || null,
     };
 
+    console.log("📤 Sending booking request:", bookingRequest);
+    console.log("📤 Query params - branchId:", formData.branchId, "typeId:", formData.typeId);
+
     try {
       const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
+
+      console.log("📦 Booking response:", response);
+      console.log("📦 Response data:", response.data);
+
+      // Axios wraps response in .data, so we need response.data
+      const bookingData = response.data;
+
+      // Try multiple possible locations for booking ID
+      const bookingId = bookingData?.bookingId ||
+                       bookingData?.data?.bookingId ||
+                       bookingData?.booking_id ||
+                       bookingData?.id;
+
+      console.log("🎯 Extracted bookingId:", bookingId);
+
+      if (!bookingId) {
+        console.error("❌ No booking ID found in response:", bookingData);
+        setMessage("Booking created but could not get booking ID. Please check 'My Bookings'.");
+        setSubmitting(false);
+        return;
+      }
+
       setMessage("Booking confirmed successfully! Redirecting to payment...");
 
-      // Get booking ID from response
-      const bookingId = response.bookingId || response.data?.bookingId;
       const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
 
       setTimeout(() => {
+        console.log("🔄 Navigating to payment with:", {
+          bookingId,
+          amount: totalPrice,
+          room: selectedRoom?.roomNumber
+        });
+
         navigate(`/payment/room/${bookingId}`, {
           state: {
             bookingType: 'room',
@@ -227,9 +276,10 @@ const fetchRoomTypes = async () => {
         });
       }, 1500);
     } catch (error) {
-      console.error("Booking error:", error);
-      const errorMsg = error.response?.data || "Booking failed. Please try again.";
-      setMessage(errorMsg);
+      console.error("❌ Booking error:", error);
+      console.error("❌ Error response:", error.response?.data);
+      const errorMsg = error.response?.data?.message || error.response?.data || "Booking failed. Please try again.";
+      setMessage(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       setSubmitting(false);
     }
   };
@@ -271,12 +321,14 @@ const fetchRoomTypes = async () => {
         {message && (
           <div
             className={`p-4 border text-sm font-light text-center mb-8 animate-fade-in ${
-              message.includes("success") || message.includes("confirmed")
+              String(message).toLowerCase().includes("success") || 
+              String(message).toLowerCase().includes("confirmed") ||
+              String(message).toLowerCase().includes("redirecting")
                 ? "bg-neutral-100 border-neutral-200 text-neutral-800"
                 : "bg-red-50 border-red-200 text-red-800"
             }`}
           >
-            {message}
+            {typeof message === 'string' ? message : JSON.stringify(message, null, 2)}
           </div>
         )}
 

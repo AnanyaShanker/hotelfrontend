@@ -110,13 +110,33 @@ export default function BookFacility() {
 
     try {
       const response = await createFacilityBooking(bookingRequest);
+
+      console.log("📦 Facility booking response:", response);
+
+      // FacilityService already unwraps response.data, so response is the data
+      const bookingId = response.facilityBookingId ||
+                       response.facility_booking_id ||
+                       response.id;
+
+      console.log("🎯 Extracted facility bookingId:", bookingId);
+
+      if (!bookingId) {
+        console.error("❌ No booking ID found in response:", response);
+        setMessage("Booking created but could not get booking ID. Please check 'My Bookings'.");
+        setSubmitting(false);
+        return;
+      }
+
+      const totalPrice = calculatePrice();
       setMessage("Booking confirmed successfully! Redirecting to payment...");
 
-      // Get booking ID from response
-      const bookingId = response.facilityBookingId;
-      const totalPrice = calculatePrice();
-
       setTimeout(() => {
+        console.log("🔄 Navigating to payment with:", {
+          bookingId,
+          amount: totalPrice,
+          facility: facility.name
+        });
+
         navigate(`/payment/facility/${bookingId}`, {
           state: {
             bookingType: 'facility',
@@ -132,9 +152,10 @@ export default function BookFacility() {
         });
       }, 1500);
     } catch (error) {
-      console.error("Booking error:", error);
-      const errorMsg = error.response?.data || "Booking failed. Please try again.";
-      setMessage(errorMsg);
+      console.error("❌ Facility booking error:", error);
+      console.error("❌ Error response:", error.response?.data);
+      const errorMsg = error.response?.data?.message || error.response?.data || "Booking failed. Please try again.";
+      setMessage(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       setSubmitting(false);
     }
   };

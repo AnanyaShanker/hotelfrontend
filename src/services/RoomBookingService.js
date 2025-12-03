@@ -26,6 +26,16 @@ class BookingService {
     return axios.get(`${API_URL}/branch/${branchId}`);
   }
 
+  // Get bookings by customer ID
+  getBookingsByCustomer(customerId) {
+    return axios.get(`${API_URL}/customer/${customerId}`);
+  }
+
+  // Get booking details with full information
+  getBookingDetails(bookingId) {
+    return axios.get(`${API_URL}/${bookingId}/details`);
+  }
+
   // Cancel booking
   cancelBooking(bookingId) {
     return axios.patch(`${API_URL}/${bookingId}/cancel`);
