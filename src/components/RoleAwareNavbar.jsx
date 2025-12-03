@@ -52,20 +52,17 @@ export default function RoleAwareNavbar() {
           </a>
           
 
-            {/* {isAuthenticated && isCustomer() &&( */}
-              <a
-                href="/book-room"
-                className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
-              >
-                Rooms
-              </a>
-            
-            {/* )} */}
+          <a
+            href="/rooms"
+            className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
+          >
+            Rooms
+          </a>
 
           {isAuthenticated && isCustomer() && (
             <>
               <a
-                href="/my-facility-bookings"
+                href="/my-bookings"
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
               >
                 My Bookings
