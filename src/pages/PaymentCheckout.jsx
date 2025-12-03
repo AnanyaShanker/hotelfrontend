@@ -12,12 +12,23 @@ export default function PaymentCheckout() {
 
   const { bookingType, bookingId, amount, bookingDetails } = location.state || {};
 
+  // Debug logging
+  useEffect(() => {
+    console.log("💳 PaymentCheckout loaded");
+    console.log("💳 Location state:", location.state);
+    console.log("💳 Booking Type:", bookingType);
+    console.log("💳 Booking ID:", bookingId);
+    console.log("💳 Amount:", amount);
+    console.log("💳 Booking Details:", bookingDetails);
+  }, []);
+
   useEffect(() => {
     // Wait for auth to finish loading
     if (authLoading) return;
 
     // Redirect to login if not authenticated
     if (!isAuthenticated) {
+      console.log("❌ Not authenticated, redirecting to login");
       navigate('/login');
       return;
     }

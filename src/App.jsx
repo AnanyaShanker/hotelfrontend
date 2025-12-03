@@ -16,10 +16,12 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
+import MyBookings from "./pages/MyBookings";
 
 <<<<<<< HEAD
 =======
 // Room Booking pages
+import Rooms from "./pages/Rooms";
 import BookRoom from "./pages/BookRoom";
 
 >>>>>>> f9bffd61b1e6a4cfcc1efeb79e9ce5f5072385e7
@@ -34,6 +36,13 @@ import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
 import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
+
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import FacilityManagement from "./pages/admin/FacilityManagement";
+import CreateFacility from "./pages/admin/CreateFacility";
+import EditFacility from "./pages/admin/EditFacility";
+import RoomManagement from "./pages/admin/RoomManagement";
 
 
 export default function App() {
@@ -57,7 +66,11 @@ export default function App() {
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
                 {/* Room Booking routes */}
+                <Route path="/rooms" element={<Rooms />} />
                 <Route path="/book-room" element={<BookRoom />} />
+
+                {/* Unified Bookings Page */}
+                <Route path="/my-bookings" element={<MyBookings />} />
 
                 {/* Payment routes */}
                 <Route path="/payment/:bookingType/:bookingId" element={<PaymentCheckout />} />
@@ -70,6 +83,48 @@ export default function App() {
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
+
+                {/* Admin Panel Routes */}
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities"
+                    element={
+                        <ProtectedRoute>
+                            <FacilityManagement />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities/create"
+                    element={
+                        <ProtectedRoute>
+                            <CreateFacility />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities/edit/:id"
+                    element={
+                        <ProtectedRoute>
+                            <EditFacility />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/rooms"
+                    element={
+                        <ProtectedRoute>
+                            <RoomManagement />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Protected routes */}
                 <Route
