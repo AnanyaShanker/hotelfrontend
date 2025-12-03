@@ -1,263 +1,502 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/axiosConfig";
 
-function Signup() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    securityQuestion: "",
-    securityAnswer: "",
-    profileImage: null,
-    idDocument: null,
-    roleId: "2",
-  });
-  const [loading, setLoading] = useState(false);
+const validators = {
+  // Required with minimum length
+  name: (val) => val.trim().length >= 5,
+  securityQuestion: (val) => val.trim().length > 0,
+  securityAnswer: (val) => val.trim().length >= 5,
+
+  // Strict validation
+  email: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+  phone: (val) => /^[0-9]{10}$/.test(val),
+  password: (val) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(val),
+};
+
+// Hints
+const passwordHint = (val) => {
+  const hints = [];
+  if (!/[a-z]/.test(val)) hints.push("lowercase");
+  if (!/[A-Z]/.test(val)) hints.push("uppercase");
+  if (!/\d/.test(val)) hints.push("number");
+  if (!/[@$!%*?&]/.test(val)) hints.push("symbol");
+  if (val.length < 8) hints.push(`${8 - val.length} more characters`);
+  return hints.join(", ");
+};
+
+const phoneHint = (val) => {
+  if (val.length < 10) return `${10 - val.length} digits remaining`;
+  return "";
+};
+
+const nameHint = (val) => {
+  if (val.length < 5) return `${5 - val.length} more characters needed`;
+  return "";
+};
+
+const securityAnswerHint = (val) => {
+  if (val.length < 5) return `${5 - val.length} more characters needed`;
+  return "";
+};
+
+export default function Signup() {
   const navigate = useNavigate();
 
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    securityQuestion: "",
+    securityAnswer: "",
+    roleId: "1",
+    status: "active",
+    notes: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [hints, setHints] = useState({
+    phone: "",
+    password: "",
+    name: "",
+    securityAnswer: "",
+  });
+  const [message, setMessage] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // ✅ Only check email, phone, password for strict validity
+  useEffect(() => {
+    setIsFormValid(
+      ["email", "phone", "password","name","securityAnswer"].every((key) => validators[key](form[key]))
+    );
+  }, [form]);
+
   const handleChange = (e) => {
-    if (e.target.type === "file") {
-      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let updated = value;
+
+    if (name === "phone") updated = value.replace(/\D/g, "");
+
+    setForm((prev) => ({ ...prev, [name]: updated }));
+
+    let msg = "";
+    let hint = "";
+
+    if (name === "password") hint = passwordHint(updated);
+    if (name === "phone") hint = phoneHint(updated);
+    if (name === "name") hint = nameHint(updated);
+    if (name === "securityAnswer") hint = securityAnswerHint(updated);
+
+    if (updated.trim() === "") {
+      msg = `${name} is required`;
+    } else if (!validators[name](updated)) {
+      switch (name) {
+        case "phone":
+          msg = "Phone must be exactly 10 digits";
+          break;
+        case "password":
+          msg =
+            "Password must include uppercase, lowercase, number, symbol, and be 8+ characters";
+          break;
+        case "email":
+          msg = "Invalid email format";
+          break;
+        case "name":
+          msg = "Name must be at least 5 characters";
+          break;
+        case "securityAnswer":
+          msg = "Security answer must be at least 5 characters";
+          break;
+        default:
+          msg = "Invalid " + name;
+      }
     }
+
+    setErrors((prev) => ({ ...prev, [name]: msg }));
+    setHints((prev) => ({ ...prev, [name]: hint }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
+
+    const newErrors = {};
+    Object.entries(validators).forEach(([key, validate]) => {
+      if (!validate(form[key])) {
+        newErrors[key] = `Invalid ${key}`;
+      }
     });
 
-    try {
-      const res = await axios.post("/api/users", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("Signup successful! User ID: " + res.data.data.userId);
-      navigate("/login");
-    } catch (err) {
-      alert("Error: " + (err.response?.data?.message || "Signup failed"));
-    } finally {
-      setLoading(false);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setMessage("⚠ Fix highlighted errors before submitting");
+      return;
     }
+
+    setMessage("🎉 Account created successfully!");
+    setTimeout(() => navigate("/login"), 1500);
   };
 
+  const ErrorText = ({ text }) =>
+    text ? <p style={{ color: "red", fontSize: "12px" }}>{text}</p> : null;
+
+  const SuccessText = ({ text }) =>
+    text ? <p style={{ color: "green", fontSize: "12px" }}>{text}</p> : null;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Decorative Blurs */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-blue-400/30 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse" />
+    <form onSubmit={handleSubmit}>
+      <input
+        name="name"
+        placeholder="Name"
+        value={form.name}
+        onChange={handleChange}
+      />
+      {errors.name && <ErrorText text={errors.name} />}
+      {form.name && !errors.name && <SuccessText text="✔ Looks good" />}
+      {hints.name && <p style={{ fontSize: "12px" }}>{hints.name}</p>}
 
-      <div className="relative max-w-2xl w-full space-y-8 bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white/20">
-        {/* Logo & Title */}
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg mb-4">
-            HE
-          </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Create Account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Join HotelEase for premium luxury stays
-          </p>
-        </div>
+      <input
+        name="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={handleChange}
+      />
+      {errors.email && <ErrorText text={errors.email} />}
+      {form.email && !errors.email && <SuccessText text="✔ Valid email" />}
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          {/* Grid Layout for Inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="John Doe"
-              />
-            </div>
+      <input
+        name="phone"
+        placeholder="Phone"
+        value={form.phone}
+        onChange={handleChange}
+      />
+      {errors.phone && <ErrorText text={errors.phone} />}
+      {form.phone && !errors.phone && <SuccessText text="✔ Valid phone" />}
+      {hints.phone && <p style={{ fontSize: "12px" }}>{hints.phone}</p>}
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="you@example.com"
-              />
-            </div>
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        value={form.password}
+        onChange={handleChange}
+      />
+      {errors.password && <ErrorText text={errors.password} />}
+      {form.password && !errors.password && (
+        <SuccessText text="✔ Strong password" />
+      )}
+      {hints.password && <p style={{ fontSize: "12px" }}>{hints.password}</p>}
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="••••••••"
-              />
-            </div>
+      <input
+        name="securityQuestion"
+        placeholder="Security Question"
+        value={form.securityQuestion}
+        onChange={handleChange}
+      />
+      {errors.securityQuestion && <ErrorText text={errors.securityQuestion} />}
+      {form.securityQuestion && !errors.securityQuestion && (
+        <SuccessText text="✔ Looks good" />
+      )}
 
-            {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="+91 98765 43210"
-              />
-            </div>
+      <input
+        name="securityAnswer"
+        placeholder="Security Answer"
+        value={form.securityAnswer}
+        onChange={handleChange}
+      />
+      {errors.securityAnswer && <ErrorText text={errors.securityAnswer} />}
+      {form.securityAnswer && !errors.securityAnswer && (
+        <SuccessText text="✔ Looks good" />
+      )}
+      {hints.securityAnswer && (
+        <p style={{ fontSize: "12px" }}>{hints.securityAnswer}</p>
+      )}
 
-            {/* Security Question */}
-            <div>
-              <label htmlFor="securityQuestion" className="block text-sm font-medium text-gray-700 mb-1">
-                Security Question
-              </label>
-              <input
-                id="securityQuestion"
-                name="securityQuestion"
-                type="text"
-                required
-                value={formData.securityQuestion}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="Your pet's name?"
-              />
-            </div>
+      <button type="submit" disabled={!isFormValid}>
+        Sign Up
+      </button>
 
-            {/* Security Answer */}
-            <div>
-              <label htmlFor="securityAnswer" className="block text-sm font-medium text-gray-700 mb-1">
-                Security Answer
-              </label>
-              <input
-                id="securityAnswer"
-                name="securityAnswer"
-                type="text"
-                required
-                value={formData.securityAnswer}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="Your answer"
-              />
-            </div>
-          </div>
-
-          {/* File Uploads */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Profile Image */}
-            <div>
-              <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700 mb-1">
-                Profile Image
-              </label>
-              <input
-                id="profileImage"
-                name="profileImage"
-                type="file"
-                accept="image/*"
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
-
-            {/* ID Document */}
-            <div>
-              <label htmlFor="idDocument" className="block text-sm font-medium text-gray-700 mb-1">
-                ID Document
-              </label>
-              <input
-                id="idDocument"
-                name="idDocument"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
-          </div>
-
-          {/* Role Selector */}
-          <div>
-            <label htmlFor="roleId" className="block text-sm font-medium text-gray-700 mb-1">
-              Account Type
-            </label>
-            <select
-              id="roleId"
-              name="roleId"
-              value={formData.roleId}
-              onChange={handleChange}
-              className="appearance-none relative block w-full px-4 py-3 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-            >
-              <option value="2">User</option>
-              <option value="1">Admin</option>
-            </select>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating account...
-              </span>
-            ) : (
-              "Create Account"
-            )}
-          </button>
-
-          {/* Login Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/login")}
-                className="font-medium text-blue-600 hover:text-blue-500 transition"
-              >
-                Sign in instead
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
+      {message && <p>{message}</p>}
+    </form>
   );
 }
 
-export default Signup;
+
+
+
+  return (
+    <div className="min-h-screen bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto animate-fade-in">
+        <div className="text-center mb-12">
+          <div className="inline-block mb-8">
+            <div className="text-3xl font-light tracking-widest text-neutral-800">
+              HOTELEASE
+            </div>
+            <div className="h-px bg-neutral-300 mt-2"></div>
+          </div>
+          <h2 className="text-2xl font-light text-neutral-900 tracking-wide mb-2">
+            Create Account
+          </h2>
+          <p className="text-sm text-neutral-600 font-light">
+            Join HotelEase for premium luxury stays 
+          </p>
+        </div>
+
+        {message && (
+          <div
+            className={`p-4 border text-sm font-light text-center mb-8 ${
+              message.includes("⚠")
+                ? "bg-red-50 border-red-200 text-red-800"
+                : "bg-neutral-100 border-neutral-200 text-neutral-800"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-8 bg-white border border-neutral-200 p-10">
+          {/* PERSONAL INFO */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-6 pb-3 border-b border-neutral-200">
+              Personal Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* NAME */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Full Name
+                </label>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  className={`block w-full px-4 py-3 border ${
+                    errors.name ? "border-red-500" : "border-neutral-300"
+                  }`}
+                />
+                <ErrorText text={errors.name} />
+              </div>
+
+              {/* EMAIL */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Email Address
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  className={`block w-full px-4 py-3 border ${
+                    errors.email ? "border-red-500" : "border-neutral-300"
+                  }`}
+                />
+                <ErrorText text={errors.email} />
+              </div>
+
+              {/* PHONE */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Phone Number
+                </label>
+                <input
+                  name="phone"
+                  maxLength="10"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="9123456789"
+                  className={`block w-full px-4 py-3 border ${
+                    errors.phone ? "border-red-500" : "border-neutral-300"
+                  }`}
+                />
+                {hints.phone && (
+                  <p className="text-blue-500 text-xs">{hints.phone}</p>
+                )}
+                <ErrorText text={errors.phone} />
+              </div>
+
+              {/* PASSWORD */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Password
+                </label>
+                <input
+                  name="password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`block w-full px-4 py-3 border ${
+                    errors.password ? "border-red-500" : "border-neutral-300"
+                  }`}
+                />
+                {hints.password && (
+                  <p className="text-blue-500 text-xs">Missing: {hints.password}</p>
+                )}
+                <ErrorText text={errors.password} />
+              </div>
+            </div>
+          </div>
+
+          {/* SECURITY INFO */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-6 pb-3 border-b border-neutral-200">
+              Security Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* QUESTION */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Security Question
+                </label>
+                <select
+                  name="securityQuestion"
+                  value={form.securityQuestion}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-3 border border-neutral-300"
+                >
+                  <option value="">Select a question</option>
+                  <option value="petName">What is your pet's name?</option>
+                  <option value="birthCity">In which city were you born?</option>
+                  <option value="motherMaiden">What is your mother's maiden name?</option>
+                  <option value="firstSchool">What was your first school?</option>
+                </select>
+                <ErrorText text={errors.securityQuestion} />
+              </div>
+
+              {/* ANSWER */}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Security Answer
+                </label>
+                <input
+                  name="securityAnswer"
+                  value={form.securityAnswer}
+                  onChange={handleChange}
+                  placeholder="Your answer"
+                  className={`block w-full px-4 py-3 border ${
+                    errors.securityAnswer ? "border-red-500" : "border-neutral-300"
+                  }`}
+                />
+                <ErrorText text={errors.securityAnswer} />
+              </div>
+            </div>
+          </div>
+
+          {/* DOCUMENTS */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-6 pb-3 border-b border-neutral-200">
+              Documents (Optional)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Profile Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setProfileImage(e.target.files[0])}
+                  className="block w-full px-4 py-3 border border-neutral-300"
+                />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  ID Document
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => setIdDocument(e.target.files[0])}
+                  className="block w-full px-4 py-3 border border-neutral-300"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ADDITIONAL INFO */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-6 pb-3 border-b border-neutral-200">
+              Additional Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Account Type
+                </label>
+                <select
+                  name="roleId"
+                  value={form.roleId}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-3 border border-neutral-300"
+                >
+                  <option value="1">Customer</option>
+                  <option value="2">Staff</option>
+                  <option value="3">Manager</option>
+                  <option value="4">Admin</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-3 border border-neutral-300"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                Notes (Optional)
+              </label>
+              <textarea
+                name="notes"
+                rows="3"
+                value={form.notes}
+                onChange={handleChange}
+                className="block w-full px-4 py-3 border border-neutral-300"
+                placeholder="Any additional information..."
+              />
+            </div>
+          </div>
+
+          {/* SUBMIT */}
+          <div className="pt-6 border-t border-neutral-200">
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className="w-full flex justify-center py-4 px-4 text-xs uppercase tracking-widest text-white bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create Account
+            </button>
+          </div>
+        </form>
+
+        {/* LOGIN LINK */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-neutral-600 font-light mb-3">
+            Already have an account?
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="text-xs uppercase tracking-widest border px-8 py-3"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+

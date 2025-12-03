@@ -15,6 +15,8 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
+import AdminLayout from "./layouts/AdminLayout";
+import DashboardPage from "./pages/DashboardPage";
 
 export default function App() {
     return (
@@ -35,6 +37,14 @@ export default function App() {
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
+                <Route
+                        path="/admin/dashboard"
+                        element={
+                            <AdminLayout>
+                            <DashboardPage />
+                            </AdminLayout>
+                        }
+                        />
                 {/* Protected routes */}
                 <Route
                     path="/users"
