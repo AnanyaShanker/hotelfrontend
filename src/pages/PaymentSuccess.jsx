@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
+import axios from '../api/axiosConfig';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -10,12 +11,77 @@ export default function PaymentSuccess() {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
+    // Update booking payment status on the backend
+    const updateBookingStatus = async () => {
+      if (!bookingId || !bookingType) return;
+
+      try {
+        console.log('📤 Attempting to update booking payment status:', { bookingId, bookingType });
+
+        // Try to update via PATCH endpoint
+        if (bookingType === 'facility') {
+          await axios.patch(`/facility-bookings/${bookingId}/payment-status`, {
+            paymentStatus: 'PAID'
+          }).catch(err => {
+            if (err.response?.status === 404) {
+              console.warn('⚠️ PATCH endpoint not found, using localStorage workaround');
+              // WORKAROUND: Store in localStorage for frontend display
+              storePaidBooking(bookingId, bookingType);
+            } else {
+              throw err;
+            }
+          });
+        } else if (bookingType === 'room') {
+          await axios.patch(`/api/bookings/${bookingId}/payment-status`, {
+            paymentStatus: 'PAID'
+          }).catch(err => {
+            if (err.response?.status === 404) {
+              console.warn('⚠️ PATCH endpoint not found, using localStorage workaround');
+              // WORKAROUND: Store in localStorage for frontend display
+              storePaidBooking(bookingId, bookingType);
+            } else {
+              throw err;
+            }
+          });
+        }
+
+        console.log('✅ Booking payment status updated successfully');
+      } catch (error) {
+        console.error('❌ Error updating booking status:', error.message);
+        // Don't block the user - payment was successful, just log the issue
+      }
+    };
+
+    // WORKAROUND: Store paid booking IDs in localStorage
+    const storePaidBooking = (id, type) => {
+      try {
+        const paidBookings = JSON.parse(localStorage.getItem('paidBookings') || '{}');
+        paidBookings[`${type}-${id}`] = {
+          bookingId: id,
+          type: type,
+          paidAt: new Date().toISOString(),
+          status: 'PAID'
+        };
+        localStorage.setItem('paidBookings', JSON.stringify(paidBookings));
+        console.log('💾 Stored payment status in localStorage:', paidBookings);
+      } catch (err) {
+        console.error('Failed to store payment status:', err);
+      }
+    };
+
+    // Update booking status first
+    updateBookingStatus();
+
     // Auto-redirect after 5 seconds
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          navigate('/my-facility-bookings');
+          // Navigate with state to force refresh
+          navigate('/my-bookings', {
+            replace: true,
+            state: { refresh: true, timestamp: Date.now() }
+          });
           return 0;
         }
         return prev - 1;
@@ -23,7 +89,7 @@ export default function PaymentSuccess() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [navigate, bookingId, bookingType]);
 
   if (!transactionId) {
     return (
@@ -119,7 +185,10 @@ export default function PaymentSuccess() {
         {/* Action Buttons */}
         <div className="flex gap-4">
           <button
-            onClick={() => navigate('/my-facility-bookings')}
+            onClick={() => navigate('/my-bookings', {
+              replace: true,
+              state: { refresh: true, timestamp: Date.now() }
+            })}
             className="flex-1 px-6 py-4 bg-neutral-800 text-white hover:bg-neutral-900 transition text-xs uppercase tracking-widest font-light"
           >
             View My Bookings

@@ -78,14 +78,14 @@ export default function MyBookings() {
       try {
         console.log("🏨 Fetching room bookings for customer:", user.userId);
         const response = await RoomBookingService.getBookingsByCustomer(user.userId);
-        
+
         console.log("📦 Room bookings response:", {
           hasData: !!response?.data,
           isArray: Array.isArray(response?.data),
           length: response?.data?.length || 0,
           firstItem: response?.data?.[0]
         });
-        
+
         // Parse response - RoomBookingService returns { data: [...] }
         if (response && response.data && Array.isArray(response.data)) {
           roomData = response.data;
@@ -113,7 +113,7 @@ export default function MyBookings() {
       console.log("🔄 Updating state...");
       console.log("   Facility bookings:", facilityDataWithStatus.length);
       console.log("   Room bookings:", roomDataWithStatus.length);
-      
+
       if (roomDataWithStatus.length > 0) {
         console.log("   Room booking sample:", roomDataWithStatus[0]);
       } else {
@@ -208,7 +208,7 @@ export default function MyBookings() {
     console.log("🔄 getAllBookings called");
     console.log("   facilityBookings:", Array.isArray(facilityBookings) ? facilityBookings.length : "NOT AN ARRAY");
     console.log("   roomBookings:", Array.isArray(roomBookings) ? roomBookings.length : "NOT AN ARRAY");
-    
+
     // Safely map facility bookings
     const facilityList = Array.isArray(facilityBookings)
       ? facilityBookings.map(b => ({
@@ -230,7 +230,7 @@ export default function MyBookings() {
       : [];
 
     console.log("📊 Mapped bookings - Facilities:", facilityList.length, "Rooms:", roomList.length);
-    
+
     if (roomBookings.length > 0 && roomList.length === 0) {
       console.error("❌ MAPPING FAILED! roomBookings has data but roomList is empty");
       console.log("   Sample roomBooking:", roomBookings[0]);
