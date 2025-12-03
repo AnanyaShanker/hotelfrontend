@@ -4,23 +4,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import BookingService from "../services/RoomBookingService";
 import RoomService from "../services/RoomService";
+import RoomTypeService from "../services/RoomTypeService";
 import { useAuth } from "../context/AuthContext";
 import BranchService from "../services/BranchService";
 import RoomList from "./RoomList";
 
-// Optional: if you add a dedicated service for room types, import it
-// import RoomTypeService from "../services/RoomTypeService";
 
 export default function BookRoom() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const { id } = useParams(); // optional: support /book-room/:id for preselected room
+  const { id } = useParams(); 
 
   const [formData, setFormData] = useState({
     customerId: user?.userId || "",
     branchId: "",
     typeId: "",
-    roomId: id || "", // preselect if arriving via /book-room/:id
+    roomId: id || "", 
     checkInDate: "",
     checkOutDate: "",
     notes: "",
@@ -77,7 +76,7 @@ const resolvePreselectedRoom = async () => {
     }
   } catch (error) {
     console.error("Error resolving preselected room:", error);
-    // If not found, gracefully allow user to select manually
+    
   }
 };
 
@@ -92,26 +91,22 @@ const fetchBranches = async () => {
   }
 };
 
-const fetchRoomTypes = async () => {
-  try {
-    // If you have a dedicated endpoint, use that:
-    // const res = await RoomTypeService.getAllRoomTypes();
-    // setRoomTypes(res.data || []);
 
-    // Fallback: derive unique types from all rooms
-    const res = await RoomService.getAllRooms();
-    const rooms = res.data || [];
-    const uniqueByTypeId = new Map();
-    rooms.forEach((r) => {
-      if (!uniqueByTypeId.has(r.typeId)) uniqueByTypeId.set(r.typeId, r);
-    });
-    setRoomTypes(Array.from(uniqueByTypeId.values()));
+
+
+const fetchRoomTypes = async (typeId) => {
+  try {
+    // Directly call your dedicated endpoint
+    const res = await RoomTypeService.getAllRoomTypes();
+
+     setRoomTypes(res.data || []);
   } catch (error) {
-    console.error("Error fetching room types:", error);
+    console.error("Error fetching Room types:", error);
     setRoomTypes([]);
   }
-};
 
+  
+};
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -204,28 +199,9 @@ const fetchRoomTypes = async () => {
     };
 
     try {
-      const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
-      setMessage("Booking confirmed successfully! Redirecting to payment...");
-
-      // Get booking ID from response
-      const bookingId = response.bookingId || response.data?.bookingId;
-      const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
-
-      setTimeout(() => {
-        navigate(`/payment/room/${bookingId}`, {
-          state: {
-            bookingType: 'room',
-            bookingId: bookingId,
-            amount: totalPrice,
-            bookingDetails: {
-              roomNumber: selectedRoom?.roomNumber || 'N/A',
-              checkIn: formData.checkInDate,
-              checkOut: formData.checkOutDate,
-              numberOfGuests: formData.quantity
-            }
-          }
-        });
-      }, 1500);
+      await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
+      setMessage("Booking confirmed successfully!");
+      setTimeout(() => navigate("/my-room-bookings"), 1500);
     } catch (error) {
       console.error("Booking error:", error);
       const errorMsg = error.response?.data || "Booking failed. Please try again.";
@@ -372,15 +348,18 @@ const fetchRoomTypes = async () => {
             </div>
 
             {/* Load Rooms */}
-            <button
+    <button
   type="button"
   onClick={loadAvailableRooms}
-  className="bg-yellow-500 text-white px-4 py-2 rounded"
+  className="px-6 py-3 rounded-lg border text-sm font-medium text-center animate-fade-in
+             bg-neutral-50 border-neutral-200 text-neutral-800 shadow-sm
+             hover:bg-blue-100 hover:border-blue-300 hover:text-blue-900 hover:shadow-md
+             transition duration-300 ease-in-out"
 >
   Load Available Rooms
 </button>
 
-{/* Replace the old <select> with RoomList */}
+
 {availableRooms.length > 0 && (
   <div>
     <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
@@ -425,12 +404,7 @@ const fetchRoomTypes = async () => {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-neutral-500 transition font-light"
                   />
-                  {formData.roomId && (
-                    <p className="text-xs text-neutral-500 mt-2 font-light">
-                      Capacity:{" "}
-                      {availableRooms.find((r) => r.roomId === parseInt(formData.roomId))?.capacity || "N/A"} guests
-                    </p>
-                  )}
+                 
                 </div>
               </div>
 
