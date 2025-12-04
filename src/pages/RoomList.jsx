@@ -16,8 +16,10 @@ export default function RoomList({ rooms, selectedRoomId, onSelect }) {
 
   if (!rooms || rooms.length === 0) {
     return (
-      <div className="text-neutral-600 font-light text-center py-10">
-        No rooms available for this branch.
+      <div className="text-center py-8">
+        <div className="text-neutral-400 text-4xl mb-4">🛏️</div>
+        <p className="text-neutral-600 font-light">No rooms available for this branch and type.</p>
+        <p className="text-neutral-500 font-light text-sm mt-2">Please try a different selection.</p>
       </div>
     );
   }
@@ -54,7 +56,7 @@ export default function RoomList({ rooms, selectedRoomId, onSelect }) {
 
         {/* Reset Filters Button */}
         <button
-           type="button" 
+          type="button"
           onClick={() => {
             setMinPrice("");
             setMaxPrice("");
@@ -75,7 +77,7 @@ export default function RoomList({ rooms, selectedRoomId, onSelect }) {
           No rooms match your filters.
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredRooms.map((room) => (
             <div
               key={room.roomId}
@@ -88,19 +90,19 @@ export default function RoomList({ rooms, selectedRoomId, onSelect }) {
             >
               {/* Room Image */}
               {room.roomPrimaryImage ? (
-                <div className="relative">
+                <div className="relative h-56">
                   <img
                     src={room.roomPrimaryImage}
                     alt={`Room ${room.roomNumber}`}
-                    className="w-full h-56 object-cover group-hover:brightness-105 transition"
+                    className="w-full h-full object-cover group-hover:brightness-105 transition"
                   />
                   <span className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
-                    ₹{room.pricePerNight}/night
+                    ₹{parseFloat(room.pricePerNight).toLocaleString()}/night
                   </span>
                 </div>
               ) : (
-                <div className="w-full h-56 bg-neutral-200 flex items-center justify-center text-neutral-500">
-                  No Image Available
+                <div className="w-full h-56 bg-neutral-200 flex items-center justify-center text-5xl">
+                  🛏️
                 </div>
               )}
 
@@ -109,21 +111,31 @@ export default function RoomList({ rooms, selectedRoomId, onSelect }) {
                 <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                   Room {room.roomNumber}
                 </h3>
-                <p className="text-sm text-neutral-700 mb-1">
-                  Capacity: <span className="font-medium">{room.capacity}</span> 
-                </p>
-                  <p className="text-sm text-neutral-700 mb-1">
-                  Status:{" "}
-                  <span
-                    className={`font-medium ${
-                      room.status === "AVAILABLE"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {room.status || "Available"}
-                  </span>
-                </p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600 font-light">Capacity</span>
+                    <span className="text-neutral-900 font-medium">{room.capacity} guests</span>
+                  </div>
+                  {room.floorNumber && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-neutral-600 font-light">Floor</span>
+                      <span className="text-neutral-900 font-light">{room.floorNumber}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600 font-light">Status</span>
+                    <span
+                      className={`font-medium ${
+                        room.status === "AVAILABLE" ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {room.status || "Available"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Room Description */}
                 {room.description && (
                   <p className="text-sm text-neutral-600 font-light mt-3 line-clamp-3">
                     {room.description}
