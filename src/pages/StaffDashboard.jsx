@@ -1,12 +1,11 @@
-import AdminLayout from "../../layouts/AdminLayout";
-import Card from "../../ui/Card";
-import Table from "../../ui/Table";
+import AdminLayout from "../layouts/AdminLayout";
+import Card from "../ui/Card";
+import Table from "../ui/Table";
 
-
-export default function AdminDashboard() {
+export default function StaffDashboard() {
   return (
     <AdminLayout>
-      <h1 className="text-3xl font-bold mb-10"> new admin Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold mb-10"> Staff Dashboard Overview</h1>
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         <Card title="Total Rooms">120</Card>
@@ -14,7 +13,7 @@ export default function AdminDashboard() {
         <Card title="Revenue Today">₹2,90,000</Card>
       </div>
 
-      <Card title="Recent booking">
+      <Card title="Recent Bookings">
         <Table
           headers={["Guest", "Room", "Status"]}
           data={[
