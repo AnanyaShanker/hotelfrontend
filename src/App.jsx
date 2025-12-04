@@ -9,7 +9,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
 
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
+
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
 import Facilities from "./pages/Facilities";
@@ -17,12 +17,10 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
-<<<<<<< HEAD
-=======
 // Room Booking pages
 import BookRoom from "./pages/BookRoom";
 
->>>>>>> f9bffd61b1e6a4cfcc1efeb79e9ce5f5072385e7
+
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -34,6 +32,12 @@ import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
 import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
+import PaymentList from "./pages/reports/PaymentList";
+import RoomPricing from "./pages/reports/RoomPricing";
+import HotelInformation from "./pages/reports/HotelInformation";
+
+
 
 
 export default function App() {
@@ -64,12 +68,15 @@ export default function App() {
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/failed" element={<PaymentFailed />} />
                 <Route path="/my-payments" element={<PaymentHistory />} />
+                <Route path="/payments" element={<PaymentList />} />
 
                 {/* Report routes */}
                 <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
+                <Route path="/settings/pricing" element={<RoomPricing/>} />
+                <Route path="/settings/hotel" element={<HotelInformation/>} />
 
                 {/* Protected routes */}
                 <Route
@@ -81,10 +88,10 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/dashboard"
+                    path="/admin-dashboard"
                     element={
                         <ProtectedRoute>
-                            <Dashboard />
+                            <AdminDashboard />
                         </ProtectedRoute>
                     }
                 />

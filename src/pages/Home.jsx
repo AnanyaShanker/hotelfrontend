@@ -28,7 +28,7 @@ export default function Home() {
               <div>
                 {isAdmin() && (
                   <button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/admin-dashboard")}
                     className="px-8 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
                   >
                     Dashboard

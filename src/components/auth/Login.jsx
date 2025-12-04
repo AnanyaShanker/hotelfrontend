@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { loginUser } from "../../services/AuthService";
 import './Login.css';
 
 export default function Login() {
@@ -9,7 +9,6 @@ export default function Login() {
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,42 +16,40 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const result = await login(email, password);
+      const response = await loginUser(email, password);
+      const token = response.data.data.token;
+      const user = response.data.data.user;
 
-      if (!result.success) {
-        setMsg(result.error || "Invalid email or password");
-        setLoading(false);
-        return;
-      }
+      // Save auth info
+      localStorage.setItem("token", token);
+      localStorage.setItem("roleId", user.roleId);
+      localStorage.setItem("userName", user.name);
 
       setMsg("Login Successful. Redirecting...");
 
-      // Check if user came from booking page
+      // Check if user came from booking or any protected page
       const returnUrl = localStorage.getItem("returnUrl");
 
       setTimeout(() => {
         if (returnUrl) {
-          // User was trying to book - send them back to booking page
+          // Redirect user back
           localStorage.removeItem("returnUrl");
           navigate(returnUrl);
+          return;
+        }
+
+        // Role-based navigation
+        if (user.roleId === 4 || user.roleId === 3) {
+          navigate("/admin-dashboard");    // Superadmin / Manager
+        } else if (user.roleId === 2) {
+          navigate("/dashboard");          // Staff
         } else {
-          // Role-based navigation
-          const roleId = result.user.roleId;
-          if (roleId === 4 || roleId === 3) {
-            // SUPERADMIN or MANAGER
-            navigate("/dashboard");
-          } else if (roleId === 2) {
-            // STAFF
-            navigate("/dashboard");
-          } else {
-            // CUSTOMER
-            navigate("/home");
-          }
+          navigate("/home");               // Customer
         }
       }, 1000);
 
     } catch (error) {
-      setMsg("An error occurred. Please try again.");
+      setMsg("Invalid email or password");
       setLoading(false);
     }
   };
@@ -60,6 +57,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
+        
         {/* Header */}
         <div className="text-center">
           <div className="inline-block mb-8">
@@ -78,11 +76,13 @@ export default function Login() {
 
         {/* Message */}
         {msg && (
-          <div className={`p-4 border text-sm font-light text-center animate-fade-in ${
-            msg.includes("Invalid") 
-              ? "bg-red-50 border-red-200 text-red-800" 
-              : "bg-neutral-100 border-neutral-200 text-neutral-800"
-          }`}>
+          <div
+            className={`p-4 border text-sm font-light text-center animate-fade-in ${
+              msg.includes("Invalid")
+                ? "bg-red-50 border-red-200 text-red-800"
+                : "bg-neutral-100 border-neutral-200 text-neutral-800"
+            }`}
+          >
             {msg}
           </div>
         )}
@@ -90,9 +90,13 @@ export default function Login() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
+
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+              <label
+                htmlFor="email"
+                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
+              >
                 Email Address
               </label>
               <input
@@ -109,7 +113,10 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+              <label
+                htmlFor="password"
+                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
+              >
                 Password
               </label>
               <input
@@ -144,9 +151,25 @@ export default function Login() {
           >
             {loading ? (
               <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Signing In...
               </span>

@@ -5,8 +5,7 @@ axios.defaults.baseURL = "http://localhost:9193"; // Spring Boot backend
 
 // List of public endpoints that don't require authentication
 const publicEndpoints = [
-  '/api/auth/login',
-  '/api/users', // POST for signup
+  '/api/auth/login', // POST for signup
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
   '/facilities/all',

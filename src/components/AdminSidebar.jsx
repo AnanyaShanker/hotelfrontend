@@ -1,44 +1,138 @@
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+
 export default function AdminSidebar({ isOpen, onClose }) {
+  const [reportsOpen, setReportsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const location = useLocation();
+
+  const menuItems = [
+    { label: "Dashboard", path: "/admin-dashboard" },
+    { label: "Bookings", path: "/bookings" },
+    { label: "Customers", path: "/users" },
+    { label: "Payments", path: "/payments" },
+    { label: "Reports", path: null },
+    { label: "Settings", path: null }, // Settings before Staff
+    { label: "Staff", path: "/staff" },
+  ];
+
   return (
     <>
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-72 bg-gradient-to-b from-gray-900 to-black text-white shadow-2xl transform transition-transform duration-300
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-neutral-50 border-r border-neutral-200 shadow-xl transform transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="p-8 border-b border-white/10 flex justify-between items-center">
+        {/* Header */}
+        <div className="p-8 border-b border-neutral-200 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-wide">Admin Panel</h2>
-            <p className="text-xs text-gray-400 mt-1">HotelEase Control</p>
+            <h2 className="text-xl font-light tracking-wide text-neutral-800">
+              Admin Panel
+            </h2>
+            <p className="text-xs text-neutral-500 mt-1">HotelEase Control</p>
           </div>
 
           {/* Close button */}
           <button
             onClick={onClose}
-            className="text-white hover:text-red-400 text-xl"
+            className="text-neutral-600 hover:text-red-500 text-lg transition"
           >
             ✕
           </button>
         </div>
 
-        <nav className="p-6 space-y-3 text-sm">
-          {[
-            "Dashboard",
-            "Rooms",
-            "Bookings",
-            "Customers",
-            "Payments",
-            "Staff",
-            "Reports",
-            "Settings",
-          ].map((item) => (
-            <div
-              key={item}
-              className="px-4 py-3 rounded-xl cursor-pointer hover:bg-white/10 transition"
-            >
-              {item}
-            </div>
-          ))}
+        {/* Navigation with scroll */}
+        <nav className="p-6 space-y-3 text-sm overflow-y-auto h-[calc(100%-5rem)]">
+          {menuItems.map((item) => {
+            if (item.label === "Reports") {
+              return (
+                <div key={item.label}>
+                  <div
+                    onClick={() => setReportsOpen(!reportsOpen)}
+                    className="px-4 py-3 rounded-lg cursor-pointer hover:bg-neutral-100 transition flex justify-between items-center text-neutral-700"
+                  >
+                    <span>Reports</span>
+                    <span className="text-xs">{reportsOpen ? "▲" : "▼"}</span>
+                  </div>
+
+                  {reportsOpen && (
+                    <div className="ml-6 mt-2 space-y-2 animate-fade-in-up">
+                      {[
+                        { label: "Housekeeping Reports", path: "/reports/housekeeping" },
+                        { label: "Room Occupancy Reports", path: "/reports/room-occupancy" },
+                        { label: "Room Revenue Reports", path: "/reports/room-revenue" },
+                        { label: "Feedback Report", path: "/reports/feedback" },
+                      ].map((subItem) => (
+                        <Link
+                          key={subItem.label}
+                          to={subItem.path}
+                          onClick={onClose}
+                          className={`block px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 transition ${
+                            location.pathname === subItem.path
+                              ? "bg-neutral-200 text-neutral-900"
+                              : "text-neutral-700"
+                          }`}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            if (item.label === "Settings") {
+              return (
+                <div key={item.label}>
+                  <div
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                    className="px-4 py-3 rounded-lg cursor-pointer hover:bg-neutral-100 transition flex justify-between items-center text-neutral-700"
+                  >
+                    <span>Settings</span>
+                    <span className="text-xs">{settingsOpen ? "▲" : "▼"}</span>
+                  </div>
+
+                  {settingsOpen && (
+                    <div className="ml-6 mt-2 space-y-2 animate-fade-in-up">
+                      {[
+                        { label: "HotelInformation Settings", path: "/settings/hotel" },
+                        { label: "RoomPricing Settings", path: "/settings/pricing" },
+                      ].map((subItem) => (
+                        <Link
+                          key={subItem.label}
+                          to={subItem.path}
+                          onClick={onClose}
+                          className={`block px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 transition ${
+                            location.pathname === subItem.path
+                              ? "bg-neutral-200 text-neutral-900"
+                              : "text-neutral-700"
+                          }`}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                onClick={onClose}
+                className={`block px-4 py-3 rounded-lg cursor-pointer hover:bg-neutral-100 transition ${
+                  location.pathname === item.path
+                    ? "bg-neutral-200 text-neutral-900"
+                    : "text-neutral-700"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
@@ -46,7 +140,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/40 z-40 animate-fade-in"
         />
       )}
     </>
