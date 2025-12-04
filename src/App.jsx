@@ -34,10 +34,6 @@ import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
-import StaffDashboard from "./pages/StaffDashboard";
-import MyTickets from "./pages/MyTickets";
-import CreateTicket from "./pages/CreateTicket";
-
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FacilityManagement from "./pages/admin/FacilityManagement";
@@ -68,6 +64,7 @@ export default function App() {
                 {/* Room Booking routes */}
                 <Route path="/rooms" element={<Rooms />} />
                 <Route path="/book-room" element={<BookRoom />} />
+                <Route path="/book-room/:id" element={<BookRoom />} />
 
                 {/* Unified Bookings Page */}
                 <Route path="/my-bookings" element={<MyBookings />} />
@@ -83,10 +80,6 @@ export default function App() {
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
-
-                {/* Support ticket routes */}
-                <Route path="/my-tickets" element={<MyTickets />} />
-                <Route path="/support/create" element={<CreateTicket />} />
 
                 {/* Admin Panel Routes */}
                 <Route
@@ -140,10 +133,10 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/staff-dashboard"
+                    path="/dashboard"
                     element={
                         <ProtectedRoute>
-                            <StaffDashboard />
+                            <Dashboard />
                         </ProtectedRoute>
                     }
                 />

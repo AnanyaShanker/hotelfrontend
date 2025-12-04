@@ -31,6 +31,30 @@ class RoomService {
     });
   }
 
+  // ✅ NEW: Get available rooms for specific date range
+  getAvailableRoomsForDates(branchId, typeId, checkIn, checkOut) {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toISOString().replace('T', ' ').substring(0, 19);
+    };
+
+    console.log("🔍 Searching rooms for dates:", {
+      branchId,
+      typeId,
+      checkIn: formatDate(checkIn),
+      checkOut: formatDate(checkOut)
+    });
+
+    return axios.get(`${API_URL}/available/dates`, {
+      params: {
+        branchId,
+        typeId,
+        checkIn: formatDate(checkIn),
+        checkOut: formatDate(checkOut)
+      }
+    });
+  }
+
   // Get room by ID
   getRoomById(roomId) {
     return axios.get(`${API_URL}/${roomId}`);
