@@ -18,13 +18,10 @@ import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 import MyBookings from "./pages/MyBookings";
 
-<<<<<<< HEAD
-=======
 // Room Booking pages
 import Rooms from "./pages/Rooms";
 import BookRoom from "./pages/BookRoom";
 
->>>>>>> f9bffd61b1e6a4cfcc1efeb79e9ce5f5072385e7
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -43,7 +40,6 @@ import FacilityManagement from "./pages/admin/FacilityManagement";
 import CreateFacility from "./pages/admin/CreateFacility";
 import EditFacility from "./pages/admin/EditFacility";
 import RoomManagement from "./pages/admin/RoomManagement";
-
 
 export default function App() {
     return (
@@ -143,6 +139,18 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                {/* Example staff dashboard (commented out for now) */}
+                {/*
+                <Route
+                    path="/staff-dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <StaffDashboard staffId={1}/>
+                        </ProtectedRoute>
+                    }
+                />
+                */}
             </Routes>
         </BrowserRouter>
     );

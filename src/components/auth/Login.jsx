@@ -40,10 +40,10 @@ export default function Login() {
           const roleId = result.user.roleId;
           if (roleId === 4 || roleId === 3) {
             // SUPERADMIN or MANAGER
-            navigate("/dashboard");
+            navigate("/admin-dashboard");
           } else if (roleId === 2) {
             // STAFF
-            navigate("/dashboard");
+            navigate("/staff-dashboard");
           } else {
             // CUSTOMER
             navigate("/home");
