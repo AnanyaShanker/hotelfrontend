@@ -11,7 +11,12 @@ const publicEndpoints = [
   '/api/auth/reset-password',
   '/facilities/all',
   '/facilities/',
-  
+  '/media/all', // Gallery images
+  '/media/download', // Media downloads
+  '/api/branches', // Public branch listing
+  '/api/roomtypes', // Public room types
+  '/api/room-types', // Alternative room types endpoint
+  '/api/rooms', // Public room browsing (GET only, handled by JwtFilter)
 ];
 
 axios.interceptors.request.use((config) => {
