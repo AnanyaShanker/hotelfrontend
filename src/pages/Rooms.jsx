@@ -23,21 +23,45 @@ export default function Rooms() {
   const fetchData = async () => {
     try {
       console.log("🔍 Fetching rooms data...");
-      const [roomsData, branchesData, typesData] = await Promise.all([
+      const [roomsResponse, branchesResponse, typesResponse] = await Promise.all([
         RoomService.getAllRooms(),
         BranchService.getAllBranches(),
-        getAllRoomTypes().then(res => res.data)
+        getAllRoomTypes()
       ]);
 
-      console.log("✅ Rooms received:", roomsData);
-      console.log("✅ Branches received:", branchesData);
-      console.log("✅ Room types received:", typesData);
+      console.log("✅ Rooms response:", roomsResponse);
+      console.log("✅ Branches response:", branchesResponse);
+      console.log("✅ Room types response:", typesResponse);
 
-      setRooms(roomsData || []);
-      setBranches(branchesData || []);
-      setRoomTypes(typesData || []);
+      // Extract data from responses - ensure arrays
+      let roomsData = roomsResponse?.data || roomsResponse || [];
+      let branchesData = branchesResponse?.data || branchesResponse || [];
+      let typesData = typesResponse?.data || typesResponse || [];
+
+      // Safety check: ensure arrays
+      if (!Array.isArray(roomsData)) {
+        console.warn("⚠️ roomsData is not an array:", roomsData);
+        roomsData = [];
+      }
+      if (!Array.isArray(branchesData)) {
+        console.warn("⚠️ branchesData is not an array:", branchesData);
+        branchesData = [];
+      }
+      if (!Array.isArray(typesData)) {
+        console.warn("⚠️ typesData is not an array:", typesData);
+        typesData = [];
+      }
+
+      console.log("📦 Extracted - Rooms:", roomsData.length);
+      console.log("📦 Extracted - Branches:", branchesData.length);
+      console.log("📦 Extracted - Room Types:", typesData.length);
+
+      setRooms(roomsData);
+      setBranches(branchesData);
+      setRoomTypes(typesData);
     } catch (error) {
       console.error("❌ Error fetching data:", error);
+      console.error("❌ Error details:", error.response?.data || error.message);
       setRooms([]);
       setBranches([]);
       setRoomTypes([]);
@@ -46,12 +70,13 @@ export default function Rooms() {
     }
   };
 
-  const filteredRooms = rooms.filter(room => {
+  // Safety check: ensure rooms is always an array before filtering
+  const filteredRooms = Array.isArray(rooms) ? rooms.filter(room => {
     const branchMatch = selectedBranch === "ALL" || room.branchId === parseInt(selectedBranch);
     const typeMatch = selectedType === "ALL" || room.typeId === parseInt(selectedType);
     const availableMatch = room.status === 'AVAILABLE';
     return branchMatch && typeMatch && availableMatch;
-  });
+  }) : [];
 
   const handleBookRoom = () => {
     if (!isAuthenticated) {
@@ -63,11 +88,13 @@ export default function Rooms() {
   };
 
   const getRoomTypeName = (typeId) => {
+    if (!Array.isArray(roomTypes)) return "Unknown";
     const type = roomTypes.find(t => t.typeId === typeId);
-    return type ? type.typeName : "Unknown";
+    return type ? (type.typeName || type.description || "Unknown") : "Unknown";
   };
 
   const getBranchName = (branchId) => {
+    if (!Array.isArray(branches)) return "Unknown";
     const branch = branches.find(b => b.branchId === branchId);
     return branch ? branch.name : "Unknown";
   };
@@ -117,7 +144,7 @@ export default function Rooms() {
                 >
                   All Branches
                 </button>
-                {branches.map((branch) => (
+                {Array.isArray(branches) && branches.map((branch) => (
                   <button
                     key={branch.branchId}
                     onClick={() => setSelectedBranch(branch.branchId.toString())}
@@ -149,7 +176,7 @@ export default function Rooms() {
                 >
                   All Types
                 </button>
-                {roomTypes.map((type) => (
+                {Array.isArray(roomTypes) && roomTypes.map((type) => (
                   <button
                     key={type.typeId}
                     onClick={() => setSelectedType(type.typeId.toString())}

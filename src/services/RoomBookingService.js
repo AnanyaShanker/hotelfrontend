@@ -28,14 +28,6 @@ class BookingService {
 
   // Get bookings by customer ID
   getBookingsByCustomer(customerId) {
-<<<<<<< HEAD
-    return axios.get(`${API_URL}/customer/${customerId}`);
-  }
-
-  // Get booking details with full information
-  getBookingDetails(bookingId) {
-    return axios.get(`${API_URL}/${bookingId}/details`);
-=======
     console.log('🔄 Fetching room bookings for customer:', customerId);
 
     // Try the ideal endpoint first
@@ -93,7 +85,6 @@ class BookingService {
         // Fallback to basic booking endpoint
         return this.getBookingById(bookingId);
       });
->>>>>>> 0b0b86626b6bf433af9f183b5cccf7fc0a147feb
   }
 
   // Cancel booking
