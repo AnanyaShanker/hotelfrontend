@@ -16,9 +16,10 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
-
+import MyBookings from "./pages/MyBookings";
 
 // Room Booking pages
+import Rooms from "./pages/Rooms";
 import BookRoom from "./pages/BookRoom";
 
 // Payment pages
@@ -32,12 +33,17 @@ import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
 import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
+
 import StaffDashboard from "./pages/StaffDashboard";
-import AdminDashboard from "./components/dashboard/AdminDashboard";
 import MyTickets from "./pages/MyTickets";
 import CreateTicket from "./pages/CreateTicket";
 
-
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import FacilityManagement from "./pages/admin/FacilityManagement";
+import CreateFacility from "./pages/admin/CreateFacility";
+import EditFacility from "./pages/admin/EditFacility";
+import RoomManagement from "./pages/admin/RoomManagement";
 
 export default function App() {
     return (
@@ -60,7 +66,11 @@ export default function App() {
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
 
                 {/* Room Booking routes */}
+                <Route path="/rooms" element={<Rooms />} />
                 <Route path="/book-room" element={<BookRoom />} />
+
+                {/* Unified Bookings Page */}
+                <Route path="/my-bookings" element={<MyBookings />} />
 
                 {/* Payment routes */}
                 <Route path="/payment/:bookingType/:bookingId" element={<PaymentCheckout />} />
@@ -75,8 +85,50 @@ export default function App() {
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
 
                 {/* Support ticket routes */}
-                <Route path="/my-tickets" element={<MyTickets/>} />
-                <Route path="support/create" element={<CreateTicket/>} />
+                <Route path="/my-tickets" element={<MyTickets />} />
+                <Route path="/support/create" element={<CreateTicket />} />
+
+                {/* Admin Panel Routes */}
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities"
+                    element={
+                        <ProtectedRoute>
+                            <FacilityManagement />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities/create"
+                    element={
+                        <ProtectedRoute>
+                            <CreateFacility />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/facilities/edit/:id"
+                    element={
+                        <ProtectedRoute>
+                            <EditFacility />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/rooms"
+                    element={
+                        <ProtectedRoute>
+                            <RoomManagement />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Protected routes */}
                 <Route
@@ -88,18 +140,10 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/admin-dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <AdminDashboard/>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
                     path="/staff-dashboard"
                     element={
                         <ProtectedRoute>
-                            <StaffDashboard/>
+                            <StaffDashboard />
                         </ProtectedRoute>
                     }
                 />
