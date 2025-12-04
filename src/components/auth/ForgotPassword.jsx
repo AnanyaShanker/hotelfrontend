@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSecurityQuestion, resetPassword } from "../../services/AuthService";
- 
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [question, setQuestion] = useState("");
@@ -9,32 +9,32 @@ export default function ForgotPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
- 
+
   const navigate = useNavigate();
- 
+
   // Validation helpers
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
- 
+
   const validatePassword = (password) => {
-    // At least 8 chars, one uppercase, one number
-    const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;;
+    // At least 8 chars, one uppercase, one number, one symbol
+    const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
     return re.test(password);
   };
- 
+
   const fetchQuestion = async () => {
     setMsg("");
     setQuestion("");
     setAnswer("");
     setNewPassword("");
- 
+
     if (!validateEmail(email)) {
       setMsg("❌ Please enter a valid email address");
       return;
     }
- 
+
     try {
       const res = await getSecurityQuestion(email);
       const q = res.data?.data?.securityQuestion;
@@ -52,27 +52,27 @@ export default function ForgotPassword() {
       }
     }
   };
- 
+
   const handleReset = async () => {
     if (!answer || !newPassword) {
       setMsg("❌ Please enter answer and new password");
       return;
     }
- 
+
     if (!validatePassword(newPassword)) {
       setMsg(
-        "❌ Password must be at least 8 characters, include an uppercase letter and a number and a symbol"
+        "❌ Password must be at least 8 characters, include an uppercase letter, a number, and a symbol"
       );
       return;
     }
- 
+
     setLoading(true);
     setMsg("");
- 
+
     try {
       const res = await resetPassword(email, answer, newPassword);
       const success = res.status === 200;
- 
+
       if (success) {
         setMsg("✔ Password reset successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 1500);
@@ -85,7 +85,7 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
- 
+
   return (
     <div className="min-h-screen bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto animate-fade-in">
@@ -104,7 +104,7 @@ export default function ForgotPassword() {
             Verify your identity using your security question.
           </p>
         </div>
- 
+
         {/* Message */}
         {msg && (
           <div
@@ -117,7 +117,7 @@ export default function ForgotPassword() {
             {msg}
           </div>
         )}
- 
+
         {/* Card */}
         <div className="bg-white border border-neutral-200 p-8">
           {/* Step 1: Email */}
@@ -141,7 +141,7 @@ export default function ForgotPassword() {
             {email && validateEmail(email) && (
               <p className="text-xs text-emerald-600 mt-2">✔ Valid email format</p>
             )}
- 
+
             <button
               type="button"
               onClick={fetchQuestion}
@@ -150,14 +150,14 @@ export default function ForgotPassword() {
               Get Security Question
             </button>
           </div>
- 
+
           {/* Step 2: Question + Reset */}
           {question && (
             <div>
               <h3 className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-4">
                 Step 2 · Answer & New Password
               </h3>
- 
+
               <div className="mb-4">
                 <div className="text-xs uppercase tracking-widest text-neutral-500 font-light mb-2">
                   Your Security Question
@@ -166,7 +166,7 @@ export default function ForgotPassword() {
                   {question}
                 </div>
               </div>
- 
+
               <div className="space-y-4">
                 <div>
                   <label
@@ -184,7 +184,7 @@ export default function ForgotPassword() {
                     className="appearance-none block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
                   />
                 </div>
- 
+
                 <div>
                   <label
                     htmlFor="newPassword"
@@ -210,7 +210,7 @@ export default function ForgotPassword() {
                     <p className="text-xs text-emerald-600 mt-2">✔ Strong password</p>
                   )}
                 </div>
- 
+
                 <button
                   type="button"
                   onClick={handleReset}
@@ -223,7 +223,7 @@ export default function ForgotPassword() {
             </div>
           )}
         </div>
- 
+
         {/* Back link */}
         <div className="text-center mt-6">
           <button
@@ -238,4 +238,3 @@ export default function ForgotPassword() {
     </div>
   );
 }
- 

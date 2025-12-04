@@ -16,10 +16,11 @@ import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
+import AdminLayout from "./layouts/AdminLayout";
+import DashboardPage from "./pages/DashboardPage";
 
 // Room Booking pages
 import BookRoom from "./pages/BookRoom";
-
 
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
@@ -36,9 +37,6 @@ import AdminDashboard from "./components/dashboard/AdminDashboard";
 import PaymentList from "./pages/reports/PaymentList";
 import RoomPricing from "./pages/reports/RoomPricing";
 import HotelInformation from "./pages/reports/HotelInformation";
-
-
-
 
 export default function App() {
     return (
@@ -75,8 +73,10 @@ export default function App() {
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
-                <Route path="/settings/pricing" element={<RoomPricing/>} />
-                <Route path="/settings/hotel" element={<HotelInformation/>} />
+                <Route path="/settings/pricing" element={<RoomPricing />} />
+                <Route path="/settings/hotel" element={<HotelInformation />} />
+
+                
 
                 {/* Protected routes */}
                 <Route

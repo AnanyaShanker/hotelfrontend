@@ -2,62 +2,55 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/AuthService";
 import './Login.css';
-
+ 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMsg("");
     setLoading(true);
-
+ 
     try {
       const response = await loginUser(email, password);
       const token = response.data.data.token;
       const user = response.data.data.user;
-
-      // Save auth info
+ 
       localStorage.setItem("token", token);
       localStorage.setItem("roleId", user.roleId);
       localStorage.setItem("userName", user.name);
-
+ 
       setMsg("Login Successful. Redirecting...");
-
-      // Check if user came from booking or any protected page
-      const returnUrl = localStorage.getItem("returnUrl");
-
+ 
       setTimeout(() => {
-        if (returnUrl) {
-          // Redirect user back
-          localStorage.removeItem("returnUrl");
-          navigate(returnUrl);
-          return;
-        }
-
         // Role-based navigation
-        if (user.roleId === 4 || user.roleId === 3) {
-          navigate("/admin-dashboard");    // Superadmin / Manager
-        } else if (user.roleId === 2) {
-          navigate("/dashboard");          // Staff
+        const roleId = user.roleId; // use the user you already extracted
+        if (roleId === 4 || roleId === 3) {
+          // SUPERADMIN or MANAGER
+          navigate("/admin-dashboard"); // match your App.js route
+        } else if (roleId === 2) {
+          // STAFF
+          navigate("/staff-dashboard"); // make sure this route exists
         } else {
-          navigate("/home");               // Customer
+          // CUSTOMER
+          navigate("/home");
         }
       }, 1000);
-
-    } catch (error) {
+      
+ 
+    } catch {
       setMsg("Invalid email or password");
       setLoading(false);
     }
   };
-
+ 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
-        
         {/* Header */}
         <div className="text-center">
           <div className="inline-block mb-8">
@@ -73,30 +66,24 @@ export default function Login() {
             Sign in to access your account
           </p>
         </div>
-
+ 
         {/* Message */}
         {msg && (
-          <div
-            className={`p-4 border text-sm font-light text-center animate-fade-in ${
-              msg.includes("Invalid")
-                ? "bg-red-50 border-red-200 text-red-800"
-                : "bg-neutral-100 border-neutral-200 text-neutral-800"
-            }`}
-          >
+          <div className={`p-4 border text-sm font-light text-center animate-fade-in ${
+            msg.includes("Invalid")
+              ? "bg-red-50 border-red-200 text-red-800"
+              : "bg-neutral-100 border-neutral-200 text-neutral-800"
+          }`}>
             {msg}
           </div>
         )}
-
+ 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-
             {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
-              >
+              <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
                 Email Address
               </label>
               <input
@@ -110,13 +97,10 @@ export default function Login() {
                 placeholder="you@example.com"
               />
             </div>
-
+ 
             {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
-              >
+              <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
                 Password
               </label>
               <input
@@ -131,7 +115,7 @@ export default function Login() {
               />
             </div>
           </div>
-
+ 
           {/* Forgot Password Link */}
           <div className="text-right">
             <button
@@ -142,7 +126,7 @@ export default function Login() {
               Forgot Password?
             </button>
           </div>
-
+ 
           {/* Submit Button */}
           <button
             type="submit"
@@ -151,25 +135,9 @@ export default function Login() {
           >
             {loading ? (
               <span className="flex items-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Signing In...
               </span>
@@ -177,7 +145,7 @@ export default function Login() {
               "Sign In"
             )}
           </button>
-
+ 
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
@@ -189,7 +157,7 @@ export default function Login() {
               </span>
             </div>
           </div>
-
+ 
           {/* Create Account Link */}
           <div className="text-center">
             <p className="text-sm text-neutral-600 font-light mb-3">
@@ -200,11 +168,13 @@ export default function Login() {
               onClick={() => navigate("/add-user")}
               className="text-xs font-light uppercase tracking-widest text-neutral-800 hover:text-neutral-900 border border-neutral-300 hover:border-neutral-400 px-8 py-3 transition inline-block"
             >
-              Create Account
+              Create Account 
+            
+
             </button>
           </div>
         </form>
-
+ 
         {/* Footer */}
         <div className="text-center pt-8">
           <button
