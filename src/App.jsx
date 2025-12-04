@@ -45,6 +45,9 @@ import CreateFacility from "./pages/admin/CreateFacility";
 import EditFacility from "./pages/admin/EditFacility";
 import RoomManagement from "./pages/admin/RoomManagement";
 
+// Manager Dashboard
+import ManagerDashboard from "./components/dashboard/ManagerDashboard";
+
 export default function App() {
     return (
         <BrowserRouter>
@@ -83,6 +86,16 @@ export default function App() {
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
+
+                {/* Manager Dashboard Route */}
+                <Route
+                    path="/manager/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <ManagerDashboard />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Support ticket routes */}
                 <Route path="/my-tickets" element={<MyTickets />} />

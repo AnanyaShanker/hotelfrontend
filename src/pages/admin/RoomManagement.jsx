@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import RoomService from '../../services/RoomService';
-import { getAllBranches } from '../../services/BranchService';
+import BranchService from '../../services/BranchService';
 import { getAllRoomTypes } from '../../services/RoomTypeService';
 
 const RoomManagement = () => {
@@ -24,13 +24,13 @@ const RoomManagement = () => {
       setLoading(true);
       const [roomsRes, branchesRes, typesRes] = await Promise.all([
         RoomService.getAllRooms(),
-        getAllBranches(),
+        BranchService.getAllBranches(),
         getAllRoomTypes()
       ]);
 
       setRooms(roomsRes.data || []);
-      setBranches(branchesRes || []);
-      setRoomTypes(typesRes || []);
+      setBranches(branchesRes.data || []);
+      setRoomTypes(typesRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       alert('Failed to load rooms');
