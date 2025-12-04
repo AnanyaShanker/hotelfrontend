@@ -34,6 +34,10 @@ import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
+import StaffDashboard from "./pages/StaffDashboard";
+import MyTickets from "./pages/MyTickets";
+import CreateTicket from "./pages/CreateTicket";
+
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FacilityManagement from "./pages/admin/FacilityManagement";
@@ -43,7 +47,6 @@ import RoomManagement from "./pages/admin/RoomManagement";
 
 // Manager Dashboard
 import ManagerDashboard from "./components/dashboard/ManagerDashboard";
-
 
 export default function App() {
     return (
@@ -93,6 +96,10 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                {/* Support ticket routes */}
+                <Route path="/my-tickets" element={<MyTickets />} />
+                <Route path="/support/create" element={<CreateTicket />} />
 
                 {/* Admin Panel Routes */}
                 <Route
@@ -146,10 +153,10 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/dashboard"
+                    path="/staff-dashboard"
                     element={
                         <ProtectedRoute>
-                            <Dashboard />
+                            <StaffDashboard />
                         </ProtectedRoute>
                     }
                 />

@@ -9,31 +9,30 @@ import { useAuth } from "../context/AuthContext";
 import BranchService from "../services/BranchService";
 import RoomList from "./RoomList";
 
-
 export default function BookRoom() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const { id } = useParams(); // optional: support /book-room/:id for preselected room
+  const { id } = useParams();
 
   const [formData, setFormData] = useState({
     customerId: user?.userId || "",
     branchId: "",
     typeId: "",
-    roomId: id || "", // preselect if arriving via /book-room/:id
+    roomId: id || "",
     checkInDate: "",
     checkOutDate: "",
     notes: "",
     quantity: 1,
   });
 
-  // Update customerId when user loads
+  // update customer ID after login load
   useEffect(() => {
     if (user?.userId && formData.customerId !== user.userId) {
-      setFormData(prev => ({ ...prev, customerId: user.userId }));
+      setFormData((prev) => ({ ...prev, customerId: user.userId }));
     }
   }, [user, formData.customerId]);
 
-  const [roomTypes, setRoomTypes] = useState([]); // dropdown of types
+  const [roomTypes, setRoomTypes] = useState([]);
   const [branches, setBranches] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -42,112 +41,101 @@ export default function BookRoom() {
 
   const today = new Date().toISOString().split("T")[0];
 
+  // wait for auth state
   useEffect(() => {
-  // Wait until auth is finished
-  if (!authLoading && !isAuthenticated) {
-    localStorage.setItem("returnUrl", window.location.pathname);
-    navigate("/login");
-  }
-  if (!authLoading && isAuthenticated) {
-    initialize();
-  }
-}, [isAuthenticated, authLoading]);
-
-// Initialize: fetch branches, room types, and optionally resolve room by ID
-const initialize = async () => {
-  try {
-    await Promise.all([fetchBranches(), fetchRoomTypes(), resolvePreselectedRoom()]);
-  } catch (e) {
-    console.error("Initialization error:", e);
-  } finally {
-    setLoading(false);
-  }
-};
-
-// If arriving with /book-room/:id, fetch that room to set branch/type
-const resolvePreselectedRoom = async () => {
-  if (!id) return;
-  try {
-    const res = await RoomService.getRoomById(id);
-    const room = res.data;
-    setFormData((prev) => ({
-      ...prev,
-      branchId: room.branchId?.toString() || "",
-      typeId: room.typeId?.toString() || "",
-      roomId: room.roomId?.toString() || "",
-    }));
-    // Load availability list for that branch/type to populate dropdown
-    if (room.branchId && room.typeId) {
-      const avail = await RoomService.getAvailableRooms(room.branchId, room.typeId);
-      setAvailableRooms(avail.data || []);
+    if (!authLoading && !isAuthenticated) {
+      localStorage.setItem("returnUrl", window.location.pathname);
+      navigate("/login");
     }
-  } catch (error) {
-    console.error("Error resolving preselected room:", error);
-    // If not found, gracefully allow user to select manually
-  }
-};
+    if (!authLoading && isAuthenticated) {
+      initialize();
+    }
+  }, [isAuthenticated, authLoading]);
 
-const fetchBranches = async () => {
-  try {
-    const res = await BranchService.getAllBranches();
-
-    setBranches(res.data || []);
-  } catch (error) {
-    console.error("Error fetching branches:", error);
-    setBranches([]);
-  }
-};
-
-const fetchRoomTypes = async () => {
-  try {
-    console.log("🔍 Fetching room types...");
-    const res = await RoomTypeService.getAllRoomTypes();
-    console.log("✅ Room types response:", res);
-
-    const types = res.data || res || [];
-    console.log("📦 Extracted room types:", types);
-
-    setRoomTypes(types);
-  } catch (error) {
-    console.error("❌ Error fetching room types:", error);
-    console.error("❌ Error details:", error.response?.data || error.message);
-
-    // Fallback: derive unique types from all rooms
-    console.log("⚠️ Using fallback: deriving types from rooms");
+  // initialize data
+  const initialize = async () => {
     try {
-      const roomsRes = await RoomService.getAllRooms();
-      const rooms = roomsRes.data || [];
-      const uniqueByTypeId = new Map();
-      rooms.forEach((r) => {
-        if (!uniqueByTypeId.has(r.typeId)) uniqueByTypeId.set(r.typeId, r);
-      });
-      setRoomTypes(Array.from(uniqueByTypeId.values()));
-    } catch (fallbackError) {
-      console.error("❌ Fallback also failed:", fallbackError);
+      await Promise.all([
+        fetchBranches(),
+        fetchRoomTypes(),
+        resolvePreselectedRoom(),
+      ]);
+    } catch (e) {
+      console.error("Initialization error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // resolve room by URL param
+  const resolvePreselectedRoom = async () => {
+    if (!id) return;
+
+    try {
+      const res = await RoomService.getRoomById(id);
+      const room = res.data;
+
+      setFormData((prev) => ({
+        ...prev,
+        branchId: room.branchId?.toString() || "",
+        typeId: room.typeId?.toString() || "",
+        roomId: room.roomId?.toString() || "",
+      }));
+
+      if (room.branchId && room.typeId) {
+        const avail = await RoomService.getAvailableRooms(
+          room.branchId,
+          room.typeId
+        );
+        setAvailableRooms(avail.data || []);
+      }
+    } catch (error) {
+      console.error("Error resolving preselected room:", error);
+    }
+  };
+
+  const fetchBranches = async () => {
+    try {
+      const res = await BranchService.getAllBranches();
+      setBranches(res.data || []);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+      setBranches([]);
+    }
+  };
+
+  // cleaned version (kept the correct branch of merge)
+  const fetchRoomTypes = async () => {
+    try {
+      const res = await RoomTypeService.getAllRoomTypes();
+      setRoomTypes(res.data || []);
+    } catch (error) {
+      console.error("Error fetching Room types:", error);
       setRoomTypes([]);
     }
-  }
-};
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Load rooms after selecting branch + type
   const loadAvailableRooms = async () => {
     setMessage("");
+
     if (!formData.branchId || !formData.typeId) {
       setMessage("Please select Branch and Room Type before loading rooms");
       return;
     }
+
     try {
-      const res = await RoomService.getAvailableRooms(formData.branchId, formData.typeId);
+      const res = await RoomService.getAvailableRooms(
+        formData.branchId,
+        formData.typeId
+      );
       setAvailableRooms(res.data || []);
-      if (res.data?.length === 0) {
+
+      if (!res.data?.length) {
         setMessage("No available rooms for the selected branch and type");
       }
     } catch (error) {
@@ -156,18 +144,21 @@ const fetchRoomTypes = async () => {
     }
   };
 
-  // Price calculation: nights * room price
   const calculatePrice = () => {
-    if (!formData.checkInDate || !formData.checkOutDate || !formData.roomId) return 0;
+    if (!formData.checkInDate || !formData.checkOutDate || !formData.roomId)
+      return 0;
+
     const checkIn = new Date(formData.checkInDate);
     const checkOut = new Date(formData.checkOutDate);
     const nights = (checkOut - checkIn) / (1000 * 60 * 60 * 24);
     if (nights <= 0) return 0;
+
     const selectedRoom = availableRooms.find(
       (r) => r.roomId === parseInt(formData.roomId)
     );
     if (!selectedRoom) return 0;
-    return (selectedRoom.pricePerNight * nights ).toFixed(2);
+
+    return (selectedRoom.pricePerNight * nights).toFixed(2);
   };
 
   const totalPrice = calculatePrice();
@@ -177,119 +168,106 @@ const fetchRoomTypes = async () => {
     setMessage("");
     setSubmitting(true);
 
-    // Validation
+    // validations
     if (!formData.checkInDate || !formData.checkOutDate) {
       setMessage("Please select check-in and check-out dates");
       setSubmitting(false);
       return;
     }
+
     const checkIn = new Date(formData.checkInDate);
     const checkOut = new Date(formData.checkOutDate);
+
     if (checkOut <= checkIn) {
       setMessage("Check-out date must be after check-in date");
       setSubmitting(false);
       return;
     }
-    if (!formData.branchId) {
-      setMessage("Please select a Branch");
+
+    if (!formData.branchId || !formData.typeId || !formData.roomId) {
+      setMessage("Please select Branch, Room Type and Room");
       setSubmitting(false);
-      return;
-    }
-    if (!formData.typeId) {
-      setMessage("Please select a Room Type");
-      setSubmitting(false);
-      return;
-    }
-    if (!formData.roomId) {
-      setMessage("Please select a Room");
-      setSubmitting(false);
-      return;
-    }
-    if (Number(formData.quantity) < 1) {
-      setMessage("Number of guests must be at least 1");
-      setSubmitting(false);
-      return;
-    }
-    if (!formData.customerId || !user?.userId) {
-      setMessage("User not authenticated. Please login again.");
-      setSubmitting(false);
-      navigate('/login');
       return;
     }
 
-    // Format dates for backend (ensure ISO datetime format)
-    const checkInDateTime = new Date(formData.checkInDate + 'T14:00:00'); // 2pm check-in
-    const checkOutDateTime = new Date(formData.checkOutDate + 'T12:00:00'); // 12pm check-out
+    if (!user?.userId) {
+      setMessage("User not authenticated. Please login again.");
+      setSubmitting(false);
+      navigate("/login");
+      return;
+    }
+
+    const checkInDateTime = new Date(
+      formData.checkInDate + "T14:00:00"
+    ).toISOString().split(".")[0];
+    const checkOutDateTime = new Date(
+      formData.checkOutDate + "T12:00:00"
+    ).toISOString().split(".")[0];
 
     const bookingRequest = {
       customerId: parseInt(formData.customerId),
       branchId: parseInt(formData.branchId),
       roomId: parseInt(formData.roomId),
-      checkInDate: checkInDateTime.toISOString().split('.')[0], // Remove milliseconds
-      checkOutDate: checkOutDateTime.toISOString().split('.')[0],
+      checkInDate: checkInDateTime,
+      checkOutDate: checkOutDateTime,
       totalPrice: parseFloat(totalPrice),
-      paymentStatus: 'PENDING',
-      bookingStatus: 'CONFIRMED',
+      paymentStatus: "PENDING",
+      bookingStatus: "CONFIRMED",
       notes: formData.notes || null,
     };
 
     console.log("📤 Sending booking request:", bookingRequest);
-    console.log("📤 Query params - branchId:", formData.branchId, "typeId:", formData.typeId);
 
     try {
-      const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
+      const response = await BookingService.createBooking(
+        bookingRequest,
+        formData.branchId,
+        formData.typeId
+      );
 
-      console.log("📦 Booking response:", response);
-      console.log("📦 Response data:", response.data);
-
-      // Axios wraps response in .data, so we need response.data
       const bookingData = response.data;
-
-      // Try multiple possible locations for booking ID
-      const bookingId = bookingData?.bookingId ||
-                       bookingData?.data?.bookingId ||
-                       bookingData?.booking_id ||
-                       bookingData?.id;
-
-      console.log("🎯 Extracted bookingId:", bookingId);
+      const bookingId =
+        bookingData?.bookingId ||
+        bookingData?.data?.bookingId ||
+        bookingData?.booking_id ||
+        bookingData?.id;
 
       if (!bookingId) {
-        console.error("❌ No booking ID found in response:", bookingData);
-        setMessage("Booking created but could not get booking ID. Please check 'My Bookings'.");
+        setMessage(
+          "Booking created but could not fetch booking ID. Please check 'My Bookings'."
+        );
         setSubmitting(false);
         return;
       }
 
       setMessage("Booking confirmed successfully! Redirecting to payment...");
 
-      const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
+      const selectedRoom = availableRooms.find(
+        (r) => r.roomId === parseInt(formData.roomId)
+      );
 
       setTimeout(() => {
-        console.log("🔄 Navigating to payment with:", {
-          bookingId,
-          amount: totalPrice,
-          room: selectedRoom?.roomNumber
-        });
-
         navigate(`/payment/room/${bookingId}`, {
           state: {
-            bookingType: 'room',
-            bookingId: bookingId,
+            bookingType: "room",
+            bookingId,
             amount: totalPrice,
             bookingDetails: {
-              roomNumber: selectedRoom?.roomNumber || 'N/A',
+              roomNumber: selectedRoom?.roomNumber,
               checkIn: formData.checkInDate,
               checkOut: formData.checkOutDate,
-              numberOfGuests: formData.quantity
-            }
-          }
+              numberOfGuests: formData.quantity,
+            },
+          },
         });
       }, 1500);
     } catch (error) {
-      console.error("❌ Booking error:", error);
-      console.error("❌ Error response:", error.response?.data);
-      const errorMsg = error.response?.data?.message || error.response?.data || "Booking failed. Please try again.";
-      setMessage(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
+      console.error("Booking error:", error);
+      const errMsg =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Booking failed. Please try again.";
+      setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
       setSubmitting(false);
     }
   };
@@ -304,6 +282,7 @@ const fetchRoomTypes = async () => {
     );
   }
 
+  
   return (
     <PublicLayout>
       <div className="py-24 max-w-4xl mx-auto animate-fade-in">

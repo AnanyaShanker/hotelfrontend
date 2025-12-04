@@ -1,7 +1,6 @@
 import axios from "../api/axiosConfig";
 
-// ✅ Match your Spring Boot controller mapping
-const API_URL = "/api/roomtypes"; // Using the primary endpoint
+const API_URL = "/api/roomtypes";
 
 class RoomTypeService {
   // Get all room types
@@ -25,16 +24,16 @@ class RoomTypeService {
     return axios.put(`${API_URL}/${id}`, roomType);
   }
 
-  // Delete room type (if you add a DELETE endpoint later)
+  // Delete room type
   deleteRoomType(id) {
     return axios.delete(`${API_URL}/${id}`);
   }
 }
 
-// Export as default (class instance) for consistency
+// Exporting single instance
 export default new RoomTypeService();
 
-// Also keep named export for backward compatibility
+// Backward compatible function (if used somewhere else)
 export const getAllRoomTypes = () => {
   console.log("🔍 Fetching room types from:", API_URL);
   return axios.get(API_URL);

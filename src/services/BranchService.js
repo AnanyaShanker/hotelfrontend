@@ -1,7 +1,6 @@
 // src/services/BranchService.js
 import axios from "../api/axiosConfig";
 
-// ✅ Match your Spring Boot controller mapping
 const API_URL = "/api/branches";
 
 class BranchService {
