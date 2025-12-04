@@ -17,12 +17,10 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 
-<<<<<<< HEAD
-=======
+
 // Room Booking pages
 import BookRoom from "./pages/BookRoom";
 
->>>>>>> f9bffd61b1e6a4cfcc1efeb79e9ce5f5072385e7
 // Payment pages
 import PaymentCheckout from "./pages/PaymentCheckout";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -34,6 +32,11 @@ import RoomOccupancyReport from "./pages/reports/RoomOccupancyReport";
 import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
+import StaffDashboard from "./pages/StaffDashboard";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
+import MyTickets from "./pages/MyTickets";
+import CreateTicket from "./pages/CreateTicket";
+
 
 
 export default function App() {
@@ -71,6 +74,10 @@ export default function App() {
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
 
+                {/* Support ticket routes */}
+                <Route path="/my-tickets" element={<MyTickets/>} />
+                <Route path="support/create" element={<CreateTicket/>} />
+
                 {/* Protected routes */}
                 <Route
                     path="/users"
@@ -81,10 +88,18 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/dashboard"
+                    path="/admin-dashboard"
                     element={
                         <ProtectedRoute>
-                            <Dashboard />
+                            <AdminDashboard/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/staff-dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <StaffDashboard/>
                         </ProtectedRoute>
                     }
                 />
