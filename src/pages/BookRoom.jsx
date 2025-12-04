@@ -581,3 +581,15 @@ const fetchRoomTypes = async () => {
     </PublicLayout>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
