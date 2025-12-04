@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../layouts/AdminLayout";
 import Card from "../../ui/Card";
 import Table from "../../ui/Table";

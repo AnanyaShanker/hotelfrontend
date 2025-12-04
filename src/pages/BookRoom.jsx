@@ -4,28 +4,34 @@ import { useNavigate, useParams } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import BookingService from "../services/RoomBookingService";
 import RoomService from "../services/RoomService";
+import RoomTypeService from "../services/RoomTypeService";
 import { useAuth } from "../context/AuthContext";
 import BranchService from "../services/BranchService";
 import RoomList from "./RoomList";
 
-// Optional: if you add a dedicated service for room types, import it
-// import RoomTypeService from "../services/RoomTypeService";
 
 export default function BookRoom() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const { id } = useParams(); // optional: support /book-room/:id for preselected room
+  const { id } = useParams(); 
 
   const [formData, setFormData] = useState({
     customerId: user?.userId || "",
     branchId: "",
     typeId: "",
-    roomId: id || "", // preselect if arriving via /book-room/:id
+    roomId: id || "", 
     checkInDate: "",
     checkOutDate: "",
     notes: "",
     quantity: 1,
   });
+
+  // Update customerId when user loads
+  useEffect(() => {
+    if (user?.userId && formData.customerId !== user.userId) {
+      setFormData(prev => ({ ...prev, customerId: user.userId }));
+    }
+  }, [user, formData.customerId]);
 
   const [roomTypes, setRoomTypes] = useState([]); // dropdown of types
   const [branches, setBranches] = useState([]);
@@ -77,7 +83,7 @@ const resolvePreselectedRoom = async () => {
     }
   } catch (error) {
     console.error("Error resolving preselected room:", error);
-    // If not found, gracefully allow user to select manually
+    
   }
 };
 
@@ -92,26 +98,22 @@ const fetchBranches = async () => {
   }
 };
 
-const fetchRoomTypes = async () => {
-  try {
-    // If you have a dedicated endpoint, use that:
-    // const res = await RoomTypeService.getAllRoomTypes();
-    // setRoomTypes(res.data || []);
 
-    // Fallback: derive unique types from all rooms
-    const res = await RoomService.getAllRooms();
-    const rooms = res.data || [];
-    const uniqueByTypeId = new Map();
-    rooms.forEach((r) => {
-      if (!uniqueByTypeId.has(r.typeId)) uniqueByTypeId.set(r.typeId, r);
-    });
-    setRoomTypes(Array.from(uniqueByTypeId.values()));
+
+
+const fetchRoomTypes = async (typeId) => {
+  try {
+    // Directly call your dedicated endpoint
+    const res = await RoomTypeService.getAllRoomTypes();
+
+     setRoomTypes(res.data || []);
   } catch (error) {
-    console.error("Error fetching room types:", error);
+    console.error("Error fetching Room types:", error);
     setRoomTypes([]);
   }
-};
 
+  
+};
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -193,45 +195,92 @@ const fetchRoomTypes = async () => {
       setSubmitting(false);
       return;
     }
+    if (!formData.customerId || !user?.userId) {
+      setMessage("User not authenticated. Please login again.");
+      setSubmitting(false);
+      navigate('/login');
+      return;
+    }
+
+    // Format dates for backend (ensure ISO datetime format)
+    const checkInDateTime = new Date(formData.checkInDate + 'T14:00:00'); // 2pm check-in
+    const checkOutDateTime = new Date(formData.checkOutDate + 'T12:00:00'); // 12pm check-out
 
     const bookingRequest = {
-      customerId: formData.customerId,
+      customerId: parseInt(formData.customerId),
       branchId: parseInt(formData.branchId),
       roomId: parseInt(formData.roomId),
-      checkInDate: formData.checkInDate,
-      checkOutDate: formData.checkOutDate,
+      checkInDate: checkInDateTime.toISOString().split('.')[0], // Remove milliseconds
+      checkOutDate: checkOutDateTime.toISOString().split('.')[0],
+      totalPrice: parseFloat(totalPrice),
+      paymentStatus: 'PENDING',
+      bookingStatus: 'CONFIRMED',
       notes: formData.notes || null,
     };
 
-    try {
-      const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
-      setMessage("Booking confirmed successfully! Redirecting to payment...");
+    console.log("📤 Sending booking request:", bookingRequest);
+    console.log("📤 Query params - branchId:", formData.branchId, "typeId:", formData.typeId);
 
-      // Get booking ID from response
-      const bookingId = response.bookingId || response.data?.bookingId;
-      const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
+// Around line 187-245, replace the conflicted section with:
 
-      setTimeout(() => {
-        navigate(`/payment/room/${bookingId}`, {
-          state: {
-            bookingType: 'room',
-            bookingId: bookingId,
-            amount: totalPrice,
-            bookingDetails: {
-              roomNumber: selectedRoom?.roomNumber || 'N/A',
-              checkIn: formData.checkInDate,
-              checkOut: formData.checkOutDate,
-              numberOfGuests: formData.quantity
-            }
-          }
-        });
-      }, 1500);
-    } catch (error) {
-      console.error("Booking error:", error);
-      const errorMsg = error.response?.data || "Booking failed. Please try again.";
-      setMessage(errorMsg);
-      setSubmitting(false);
-    }
+try {
+  const response = await BookingService.createBooking(bookingRequest, formData.branchId, formData.typeId);
+
+  console.log("📦 Booking response:", response);
+  console.log("📦 Response data:", response.data);
+
+  // Axios wraps response in .data, so we need response.data
+  const bookingData = response.data;
+
+  // Try multiple possible locations for booking ID
+  const bookingId = bookingData?.bookingId ||
+                   bookingData?.data?.bookingId ||
+                   bookingData?.booking_id ||
+                   bookingData?.id;
+
+  console.log("🎯 Extracted bookingId:", bookingId);
+
+  if (!bookingId) {
+    console.error("❌ No booking ID found in response:", bookingData);
+    setMessage("Booking created but could not get booking ID. Please check 'My Bookings'.");
+    setSubmitting(false);
+    return;
+  }
+
+  setMessage("Booking confirmed successfully! Redirecting to payment...");
+
+  const selectedRoom = availableRooms.find(r => r.roomId === parseInt(formData.roomId));
+
+  setTimeout(() => {
+    console.log("🔄 Navigating to payment with:", {
+      bookingId,
+      amount: totalPrice,
+      room: selectedRoom?.roomNumber
+    });
+
+    navigate(`/payment/room/${bookingId}`, {
+      state: {
+        bookingType: 'room',
+        bookingId: bookingId,
+        amount: totalPrice,
+        bookingDetails: {
+          roomNumber: selectedRoom?.roomNumber || 'N/A',
+          checkIn: formData.checkInDate,
+          checkOut: formData.checkOutDate,
+          numberOfGuests: formData.quantity
+        }
+      }
+    });
+  }, 1500);
+} catch (error) {
+  console.error("❌ Booking error:", error);
+  console.error("❌ Error response:", error.response?.data);
+  const errorMsg = error.response?.data?.message || error.response?.data || "Booking failed. Please try again.";
+  setMessage(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
+  setSubmitting(false);
+}
+
+    
   };
 
   if (loading) {
@@ -250,10 +299,10 @@ const fetchRoomTypes = async () => {
         {/* Header */}
         <div className="mb-12">
           <button
-            onClick={() => navigate("/rooms")}
+            onClick={() => navigate("/home")}
             className="text-xs uppercase tracking-wider text-neutral-600 hover:text-neutral-900 transition font-light mb-6"
           >
-            ← Back to Rooms
+            ← Back to Home
           </button>
 
           <div className="text-center">
@@ -271,12 +320,14 @@ const fetchRoomTypes = async () => {
         {message && (
           <div
             className={`p-4 border text-sm font-light text-center mb-8 animate-fade-in ${
-              message.includes("success") || message.includes("confirmed")
+              String(message).toLowerCase().includes("success") || 
+              String(message).toLowerCase().includes("confirmed") ||
+              String(message).toLowerCase().includes("redirecting")
                 ? "bg-neutral-100 border-neutral-200 text-neutral-800"
                 : "bg-red-50 border-red-200 text-red-800"
             }`}
           >
-            {message}
+            {typeof message === 'string' ? message : JSON.stringify(message, null, 2)}
           </div>
         )}
 
@@ -372,15 +423,18 @@ const fetchRoomTypes = async () => {
             </div>
 
             {/* Load Rooms */}
-            <button
+    <button
   type="button"
   onClick={loadAvailableRooms}
-  className="bg-yellow-500 text-white px-4 py-2 rounded"
+  className="px-6 py-3 rounded-lg border text-sm font-medium text-center animate-fade-in
+             bg-neutral-50 border-neutral-200 text-neutral-800 shadow-sm
+             hover:bg-blue-100 hover:border-blue-300 hover:text-blue-900 hover:shadow-md
+             transition duration-300 ease-in-out"
 >
   Load Available Rooms
 </button>
 
-{/* Replace the old <select> with RoomList */}
+
 {availableRooms.length > 0 && (
   <div>
     <label className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
@@ -425,12 +479,7 @@ const fetchRoomTypes = async () => {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-neutral-500 transition font-light"
                   />
-                  {formData.roomId && (
-                    <p className="text-xs text-neutral-500 mt-2 font-light">
-                      Capacity:{" "}
-                      {availableRooms.find((r) => r.roomId === parseInt(formData.roomId))?.capacity || "N/A"} guests
-                    </p>
-                  )}
+                 
                 </div>
               </div>
 

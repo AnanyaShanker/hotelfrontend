@@ -2,10 +2,10 @@ import AdminLayout from "../layouts/AdminLayout";
 import Card from "../ui/Card";
 import Table from "../ui/Table";
 
-export default function Dashboard() {
+export default function StaffDashboard() {
   return (
     <AdminLayout>
-      <h1 className="text-3xl font-bold mb-10">ADMIN Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold mb-10"> Staff Dashboard Overview</h1>
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         <Card title="Total Rooms">120</Card>

@@ -44,7 +44,7 @@ export default function Home() {
                 )}
                 {isCustomer() && (
                   <button
-                    onClick={() => navigate("/my-facility-bookings")}
+                    onClick={() => navigate("/my-bookings")}
                     className="px-8 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
                   >
                     My Bookings
@@ -156,6 +156,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ROOMS SECTION */}
+      <section className="mb-24">
+        <div className="border-t border-neutral-200 pt-24 pb-16">
+          <div className="text-center mb-16">
+            <span className="inline-block text-xs uppercase tracking-widest text-neutral-600 font-light mb-6">
+              Accommodations
+            </span>
+            <h2 className="text-3xl md:text-4xl font-light mb-6 text-neutral-900 tracking-wide">
+              Luxury Rooms & Suites
+            </h2>
+            <p className="text-neutral-700 text-base mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+              Experience comfort and elegance in our thoughtfully designed rooms,
+              perfect for both leisure and business travelers.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-neutral-50 border border-neutral-200 p-8 hover:border-neutral-300 transition-all animate-fade-in-up animate-delay-100">
+              <div className="text-5xl mb-6">🛏️</div>
+              <h3 className="text-xl font-light mb-3 text-neutral-900 tracking-wide">Deluxe Rooms</h3>
+              <p className="text-neutral-700 font-light text-sm mb-4">
+                Spacious rooms with modern amenities and stunning views
+              </p>
+              <div className="text-neutral-600 text-sm font-light">From ₹5,000/night</div>
+            </div>
+
+            <div className="bg-neutral-50 border border-neutral-200 p-8 hover:border-neutral-300 transition-all animate-fade-in-up animate-delay-200">
+              <div className="text-5xl mb-6">👑</div>
+              <h3 className="text-xl font-light mb-3 text-neutral-900 tracking-wide">Executive Suites</h3>
+              <p className="text-neutral-700 font-light text-sm mb-4">
+                Premium suites with separate living areas and luxury furnishings
+              </p>
+              <div className="text-neutral-600 text-sm font-light">From ₹12,000/night</div>
+            </div>
+
+            <div className="bg-neutral-50 border border-neutral-200 p-8 hover:border-neutral-300 transition-all animate-fade-in-up animate-delay-300">
+              <div className="text-5xl mb-6">✨</div>
+              <h3 className="text-xl font-light mb-3 text-neutral-900 tracking-wide">Presidential Suite</h3>
+              <p className="text-neutral-700 font-light text-sm mb-4">
+                Ultimate luxury with panoramic views and butler service
+              </p>
+              <div className="text-neutral-600 text-sm font-light">From ₹25,000/night</div>
+            </div>
+          </div>
+
+          {/* View All Rooms Button */}
+          <div className="text-center">
+            <button
+              onClick={() => navigate("/rooms")}
+              className="px-10 py-4 border border-neutral-300 text-neutral-800 font-light text-sm tracking-wider uppercase hover:border-neutral-400 hover:bg-neutral-50 transition"
+            >
+              View All Rooms
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* TESTIMONIALS */}
       <section className="mb-24">
         <div className="text-center mb-16">
@@ -264,7 +321,7 @@ export default function Home() {
                 Browse Facilities
               </button>
               <button
-                onClick={() => navigate("/my-facility-bookings")}
+                onClick={() => navigate("/my-bookings")}
                 className="px-10 py-4 border border-white text-white font-light text-sm tracking-wider uppercase hover:bg-white/10 transition"
               >
                 My Bookings

@@ -36,8 +36,23 @@ export default function Login() {
           // STAFF
           navigate("/staff-dashboard"); // make sure this route exists
         } else {
+
           // CUSTOMER
           navigate("/home");
+
+          // Role-based navigation
+          const roleId = result.user.roleId;
+          if (roleId === 4 || roleId === 3) {
+            // SUPERADMIN or MANAGER
+            navigate("/admin-dashboard");
+          } else if (roleId === 2) {
+            // STAFF
+            navigate("/staff-dashboard");
+          } else {
+            // CUSTOMER
+            navigate("/home");
+          }
+
         }
       }, 1000);
       

@@ -50,21 +50,19 @@ export default function RoleAwareNavbar() {
           >
             Facilities
           </a>
+          
 
-            {/* {isAuthenticated && isCustomer() &&( */}
-              <a
-                href="/book-room"
-                className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
-              >
-                Rooms
-              </a>
-            
-            {/* )} */}
+          <a
+            href="/rooms"
+            className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
+          >
+            Rooms
+          </a>
 
           {isAuthenticated && isCustomer() && (
             <>
               <a
-                href="/my-facility-bookings"
+                href="/my-bookings"
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
               >
                 My Bookings
@@ -179,6 +177,18 @@ export default function RoleAwareNavbar() {
                       Bookings
                     </button>
                   )}
+                  
+                  {isCustomer() && (
+                    <button
+                       onClick={() => {
+                        navigate("/my-tickets");
+                        setShowUserMenu(false);
+                      }}
+                     className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
+                   >
+                       Raised Tickets
+                    </button>
+                  )}
 
                   {isAdmin() && (
                     <button
@@ -269,7 +279,10 @@ export default function RoleAwareNavbar() {
           <a href="/facilities" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Facilities</a>
 
           {isAuthenticated && isCustomer() && (
+            <>
             <a href="/my-bookings" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">My Bookings</a>
+            <a  href="/support-tickets" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition"> Raised Tickets</a>
+            </>
           )}
 
           {isAuthenticated && isAdmin() && (

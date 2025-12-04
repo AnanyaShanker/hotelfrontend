@@ -35,6 +35,39 @@ class RoomService {
   getRoomById(roomId) {
     return axios.get(`${API_URL}/${roomId}`);
   }
+
+  // Admin: Create new room
+  createRoom(roomData) {
+    return axios.post(API_URL, roomData);
+  }
+
+  // Admin: Update room
+  updateRoom(roomId, roomData) {
+    return axios.put(`${API_URL}/${roomId}`, roomData);
+  }
+
+  // Admin: Delete room
+  deleteRoom(roomId) {
+    return axios.delete(`${API_URL}/${roomId}`);
+  }
+
+  // Admin: Update room status
+  updateRoomStatus(roomId, status) {
+    return axios.patch(`${API_URL}/${roomId}/status`, null, {
+      params: { status }
+    });
+  }
+
+  // Admin: Upload room image
+  uploadRoomImage(roomId, imageFile) {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+    return axios.post(`${API_URL}/${roomId}/image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
 }
 
 export default new RoomService();
