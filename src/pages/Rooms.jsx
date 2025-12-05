@@ -5,7 +5,7 @@ import PublicLayout from "../layouts/PublicLayout";
 import BookingService from "../services/RoomBookingService";
 import RoomService from "../services/RoomService";
 import RoomTypeService from "../services/RoomTypeService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import BranchService from "../services/BranchService";
 import RoomList from "./RoomList";
 

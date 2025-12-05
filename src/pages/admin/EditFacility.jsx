@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getFacilityById, updateFacility, uploadPrimaryImage, uploadGalleryMultiple } from '../../services/FacilityService';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 const EditFacility = () => {
   const { id } = useParams();

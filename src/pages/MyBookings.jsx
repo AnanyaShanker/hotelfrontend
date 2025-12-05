@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import { getFacilityBookingsByCustomer, getFacilityBookingDetails, cancelFacilityBooking } from "../services/FacilityService";
 import RoomBookingService from "../services/RoomBookingService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function MyBookings() {
   const [facilityBookings, setFacilityBookings] = useState([]);

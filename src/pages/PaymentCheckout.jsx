@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePayment } from '../hooks/usePayment';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import PublicLayout from '../layouts/PublicLayout';
 
 export default function PaymentCheckout() {

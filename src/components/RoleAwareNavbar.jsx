@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function RoleAwareNavbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout, getRoleName, isAdmin, isStaff, isCustomer } = useAuth();
+  const { user, isAuthenticated, logout, getRoleName, isAdmin, isStaff, isCustomer, hasRole } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -79,7 +79,7 @@ export default function RoleAwareNavbar() {
           {isAuthenticated && isAdmin() && (
             <>
               <a
-                href="/dashboard"
+                href={hasRole('MANAGER') ? '/manager/dashboard' : '/admin/dashboard'}
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
               >
                 Dashboard
@@ -193,7 +193,8 @@ export default function RoleAwareNavbar() {
                   {isAdmin() && (
                     <button
                       onClick={() => {
-                        navigate("/dashboard");
+                        const dashboardRoute = hasRole('MANAGER') ? '/manager/dashboard' : '/admin/dashboard';
+                        navigate(dashboardRoute);
                         setShowUserMenu(false);
                       }}
                       className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
@@ -287,7 +288,7 @@ export default function RoleAwareNavbar() {
 
           {isAuthenticated && isAdmin() && (
             <>
-              <a href="/dashboard" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Dashboard</a>
+              <a href={hasRole('MANAGER') ? '/manager/dashboard' : '/admin/dashboard'} className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Dashboard</a>
               <a href="/manage-bookings" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Bookings</a>
             </>
           )}
