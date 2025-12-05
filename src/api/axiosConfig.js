@@ -1,4 +1,4 @@
-// src/api/axiosConfig.js
+
 import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:9193"; // Spring Boot backend
