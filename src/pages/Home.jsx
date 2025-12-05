@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import HeroCarousel from "../components/HeroCarousel";
 import FacilityCard from "../components/FacilityCard";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { isAuthenticated, user, isAdmin, isStaff, isCustomer } = useAuth();
+  const { isAuthenticated, user, hasRole, isAdmin, isStaff, isCustomer } = useAuth();
 
   return (
     <PublicLayout>
@@ -28,7 +28,10 @@ export default function Home() {
               <div>
                 {isAdmin() && (
                   <button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => {
+                      const dashboardRoute = hasRole('MANAGER') ? '/manager/dashboard' : '/admin/dashboard';
+                      navigate(dashboardRoute);
+                    }}
                     className="px-8 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
                   >
                     Dashboard

@@ -47,17 +47,67 @@ const ManagerDashboard = () => {
   const [showStaffTasksModal, setShowStaffTasksModal] = useState(false);
   const [staffTasks, setStaffTasks] = useState([]);
 
-  // Get branch ID from user data
-  const branchId = user?.branchId || localStorage.getItem('branchId');
+  // Get branch ID from user data (provided by /api/auth/login)
+  const [branchId, setBranchId] = useState(user?.branchId || localStorage.getItem('branchId'));
+
+  // Initialize branchId on mount
+  useEffect(() => {
+    const initializeBranch = async () => {
+      // First priority: user.branchId from login response
+      if (user?.branchId) {
+        console.log('✅ Using branchId from user data:', user.branchId);
+        setBranchId(user.branchId);
+        localStorage.setItem('branchId', user.branchId.toString());
+        return;
+      }
+
+      // Second priority: localStorage
+      const storedBranchId = localStorage.getItem('branchId');
+      if (storedBranchId) {
+        console.log('✅ Using branchId from localStorage:', storedBranchId);
+        setBranchId(parseInt(storedBranchId));
+        return;
+      }
+
+      // Fallback: Fetch from API (only if /api/auth/login didn't provide it)
+      if (user?.userId) {
+        try {
+          console.log('⚠️ No branchId in user data, fetching from API for manager:', user.userId);
+
+          const response = await fetch(`http://localhost:9193/api/branches`);
+          const branches = await response.json();
+
+          const managerBranch = branches.find(branch => branch.managerId === user.userId);
+
+          if (managerBranch) {
+            console.log('✅ Found manager branch from API:', managerBranch);
+            setBranchId(managerBranch.branchId);
+            localStorage.setItem('branchId', managerBranch.branchId.toString());
+            toast.info(`Managing: ${managerBranch.name}`);
+          } else {
+            console.warn('⚠️ No branch assigned, defaulting to branch 1');
+            setBranchId(1);
+            localStorage.setItem('branchId', '1');
+            toast.warning('No specific branch assigned. Showing default branch data.');
+          }
+        } catch (error) {
+          console.error('❌ Error fetching manager branch:', error);
+          setBranchId(1);
+          localStorage.setItem('branchId', '1');
+          toast.error('Could not determine branch. Using default.');
+        }
+      }
+    };
+
+    initializeBranch();
+  }, [user]);
 
   // Initial data load
   useEffect(() => {
-    if (!branchId) {
-      toast.error('Branch ID not found. Please login again.');
-      navigate('/login');
-      return;
+    if (branchId) {
+      console.log('📊 Loading dashboard for branch:', branchId);
+      fetchDashboardData();
     }
-    fetchDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [branchId]);
 

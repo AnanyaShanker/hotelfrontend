@@ -9,7 +9,6 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
 
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
 import Facilities from "./pages/Facilities";
@@ -152,6 +151,8 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                {/* Staff dashboard route (final chosen version) */}
                 <Route
                     path="/staff-dashboard"
                     element={
