@@ -61,11 +61,20 @@ export const AuthProvider = ({ children }) => {
       // Handle multiple possible response structures
       let token, userData;
 
-      if (response.data.data) {
-        // Structure: { data: { token, user } }
-        ({ token, user: userData } = response.data.data);
+      // Backend returns: { status, message, data: { user, token } }
+      if (response.data.data && typeof response.data.data === 'object') {
+        const responseData = response.data.data;
+
+        // Extract user and token (handle both property orders)
+        userData = responseData.user;
+        token = responseData.token;
+
+        // If not found, try destructuring
+        if (!token || !userData) {
+          ({ token, user: userData } = responseData);
+        }
       } else if (response.data.token && response.data.user) {
-        // Structure: { token, user }
+        // Direct structure: { token, user }
         token = response.data.token;
         userData = response.data.user;
       } else {
@@ -137,7 +146,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     initAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = {
@@ -159,4 +167,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
-

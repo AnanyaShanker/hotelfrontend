@@ -1,10 +1,10 @@
 // Admin Dashboard - Main entry point for admin panel
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
 import { getAllFacilities } from '../../services/FacilityService';
 import RoomService from '../../services/RoomService';
 import { useAuth } from '../../hooks/useAuth';
+
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
@@ -190,4 +190,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
