@@ -102,5 +102,6 @@ class MediaService {
 
 export default new MediaService();
 
+// Create and export an instance of the service
 
 

@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import { getAllFacilities } from "../services/FacilityService";
-import { useAuth } from "../context/AuthContext";
+
+import { useAuth } from "../hooks/useAuth";
 
 export default function Facilities() {
   const [facilities, setFacilities] = useState([]);

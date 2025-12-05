@@ -31,6 +31,49 @@ class RoomService {
     });
   }
 
+  // Get available rooms for specific dates (NEW METHOD)
+  getAvailableRoomsForDates(branchId, typeId, checkIn, checkOut) {
+    console.log('🔍 RoomService.getAvailableRoomsForDates called with:', {
+      branchId,
+      typeId,
+      checkIn,
+      checkOut
+    });
+
+    // Format dates if they're Date objects or need formatting
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+
+      // If it's already in YYYY-MM-DD format, return as-is
+      if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
+
+      // Otherwise, format it
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0]; // YYYY-MM-DD
+    };
+
+    const params = {
+      branchId,
+      typeId,
+      checkIn: formatDate(checkIn),
+      checkOut: formatDate(checkOut)
+    };
+
+    console.log('📤 Sending request to:', `${API_URL}/available/dates`, 'with params:', params);
+
+    return axios.get(`${API_URL}/available/dates`, { params })
+      .then(response => {
+        console.log('✅ Got available rooms:', response.data);
+        return response;
+      })
+      .catch(error => {
+        console.error('❌ Error fetching available rooms for dates:', error);
+        throw error;
+      });
+  }
+
   // Get room by ID
   getRoomById(roomId) {
     return axios.get(`${API_URL}/${roomId}`);

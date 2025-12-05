@@ -5,9 +5,10 @@ import PublicLayout from "../layouts/PublicLayout";
 import BookingService from "../services/RoomBookingService";
 import RoomService from "../services/RoomService";
 import RoomTypeService from "../services/RoomTypeService";
-import { useAuth } from "../context/AuthContext";
+
 import BranchService from "../services/BranchService";
 import RoomList from "./RoomList";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function BookRoom() {
@@ -90,7 +91,7 @@ const resolvePreselectedRoom = async () => {
 const fetchBranches = async () => {
   try {
     const res = await BranchService.getAllBranches();
-    
+
     setBranches(res.data || []);
   } catch (error) {
     console.error("Error fetching branches:", error);
@@ -156,7 +157,7 @@ const fetchRoomTypes = async () => {
     }
   };
 
-  // Price calculation: nights * room price 
+  // Price calculation: nights * room price
   const calculatePrice = () => {
     if (!formData.checkInDate || !formData.checkOutDate || !formData.roomId) return 0;
     const checkIn = new Date(formData.checkInDate);
@@ -482,7 +483,7 @@ const fetchRoomTypes = async () => {
                     max={
       availableRooms.find((r) => r.roomId === parseInt(formData.roomId))?.capacity || 1
     }
-                  
+
                     value={formData.quantity}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-neutral-500 transition font-light"
@@ -581,15 +582,3 @@ const fetchRoomTypes = async () => {
     </PublicLayout>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-

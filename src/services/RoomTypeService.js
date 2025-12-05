@@ -1,5 +1,3 @@
-
-
 import axios from "../api/axiosConfig";
 
 // ✅ Match your Spring Boot controller mapping
@@ -41,4 +39,3 @@ export const getAllRoomTypes = () => {
   console.log("🔍 Fetching room types from:", API_URL);
   return axios.get(API_URL);
 };
-

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import './Login.css';
 
 export default function Login() {
@@ -38,20 +38,23 @@ export default function Login() {
         } else {
           // Role-based navigation
           const roleId = result.user.roleId;
-          if (roleId === 4 || roleId === 3) {
-            // SUPERADMIN or MANAGER
-            navigate("/admin-dashboard");
+          if (roleId === 4) {
+            // SUPERADMIN - route to admin dashboard
+            navigate("/admin/dashboard");
+          } else if (roleId === 3) {
+            // MANAGER - route to manager dashboard
+            navigate("/manager/dashboard");
           } else if (roleId === 2) {
-            // STAFF
-            navigate("/staff-dashboard");
+            // STAFF - route to staff dashboard (you can create this later)
+            navigate("/home"); // For now, send to home
           } else {
-            // CUSTOMER
+            // CUSTOMER - route to home
             navigate("/home");
           }
         }
       }, 1000);
 
-    } catch (error) {
+    } catch {
       setMsg("An error occurred. Please try again.");
       setLoading(false);
     }

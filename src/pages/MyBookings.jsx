@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import { getFacilityBookingsByCustomer, getFacilityBookingDetails, cancelFacilityBooking } from "../services/FacilityService";
 import RoomBookingService from "../services/RoomBookingService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function MyBookings() {
   const [facilityBookings, setFacilityBookings] = useState([]);
@@ -14,6 +14,10 @@ export default function MyBookings() {
   const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, CONFIRMED, CANCELLED, COMPLETED
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -185,21 +189,37 @@ export default function MyBookings() {
     }
   };
 
-  const handleCancelBooking = async (bookingId, type) => {
-    if (!confirm("Are you sure you want to cancel this booking?")) return;
+  const handleCancelClick = (bookingId, type) => {
+    setBookingToCancel({ id: bookingId, type });
+    setCancelReason("");
+    setShowCancelModal(true);
+  };
 
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return;
+
+    setCancelling(true);
     try {
-      if (type === 'FACILITY') {
-        await cancelFacilityBooking(bookingId, user.userId);
+      if (bookingToCancel.type === 'FACILITY') {
+        await cancelFacilityBooking(bookingToCancel.id, user.userId);
       } else {
-        await RoomBookingService.cancelBooking(bookingId);
+        await RoomBookingService.cancelBooking(bookingToCancel.id);
       }
 
-      alert("Booking cancelled successfully");
-      fetchAllBookings();
+      setShowCancelModal(false);
+      setBookingToCancel(null);
+      setCancelReason("");
+
+      // Show success message
+      setTimeout(() => {
+        alert("Booking cancelled successfully");
+        fetchAllBookings();
+      }, 100);
     } catch (error) {
       console.error("Error cancelling booking:", error);
-      alert("Failed to cancel booking");
+      alert("Failed to cancel booking. Please try again.");
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -521,11 +541,11 @@ export default function MyBookings() {
 
                       {booking.bookingStatus === 'CONFIRMED' && (
                         <button
-                          onClick={() => handleCancelBooking(
+                          onClick={() => handleCancelClick(
                             booking.facilityBookingId || booking.bookingId,
                             booking.type
                           )}
-                          className="px-4 py-2 border border-red-300 text-red-700 text-xs uppercase tracking-widest font-light hover:border-red-400 transition"
+                          className="px-4 py-2 border border-red-300 text-red-700 text-xs uppercase tracking-widest font-light hover:border-red-400 hover:bg-red-50 transition"
                         >
                           Cancel
                         </button>
@@ -739,6 +759,99 @@ export default function MyBookings() {
                     Pay Now
                   </button>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cancel Booking Modal */}
+        {showCancelModal && bookingToCancel && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="bg-white max-w-lg w-full shadow-2xl animate-slide-up">
+              {/* Modal Header */}
+              <div className="border-b border-neutral-200 p-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-light text-neutral-900 tracking-wide">
+                    Cancel Booking
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowCancelModal(false);
+                      setBookingToCancel(null);
+                      setCancelReason("");
+                    }}
+                    disabled={cancelling}
+                    className="text-neutral-600 hover:text-neutral-900 text-2xl font-light disabled:opacity-50 transition"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <p className="text-neutral-700 font-light text-sm">
+                    Are you sure you want to cancel this {bookingToCancel.type.toLowerCase()} booking?
+                  </p>
+
+                  <div className="bg-amber-50 border border-amber-200 p-4 text-sm rounded">
+                    <p className="text-amber-800 font-light">
+                      ⚠️ <strong className="font-normal">Important:</strong> This action cannot be undone.
+                      {bookingToCancel.type === 'ROOM' && ' Please check the cancellation policy for any applicable fees.'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="cancelReason"
+                      className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
+                    >
+                      Reason for Cancellation (Optional)
+                    </label>
+                    <textarea
+                      id="cancelReason"
+                      value={cancelReason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      disabled={cancelling}
+                      rows="3"
+                      placeholder="Please let us know why you're cancelling..."
+                      className="w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition font-light disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-neutral-200 p-6 flex justify-end gap-4">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setBookingToCancel(null);
+                    setCancelReason("");
+                  }}
+                  disabled={cancelling}
+                  className="px-6 py-3 border border-neutral-300 text-neutral-800 text-xs uppercase tracking-widest font-light hover:border-neutral-400 hover:bg-neutral-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Keep Booking
+                </button>
+                <button
+                  onClick={handleCancelBooking}
+                  disabled={cancelling}
+                  className="px-6 py-3 bg-red-600 text-white text-xs uppercase tracking-widest font-light hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {cancelling ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Cancelling...
+                    </>
+                  ) : (
+                    'Yes, Cancel Booking'
+                  )}
+                </button>
               </div>
             </div>
           </div>

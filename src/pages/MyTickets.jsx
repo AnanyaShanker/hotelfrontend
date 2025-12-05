@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axiosConfig";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function MyTickets() {

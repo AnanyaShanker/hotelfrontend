@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllFacilities, deleteFacility } from '../../services/FacilityService';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 const FacilityManagement = () => {
   const [facilities, setFacilities] = useState([]);
