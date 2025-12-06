@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import './Login.css';
-
+ 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,26 +10,26 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMsg("");
     setLoading(true);
-
+ 
     try {
       const result = await login(email, password);
-
+ 
       if (!result.success) {
         setMsg(result.error || "Invalid email or password");
         setLoading(false);
         return;
       }
-
+ 
       setMsg("Login Successful. Redirecting...");
-
+ 
       // Check if user came from booking page
       const returnUrl = localStorage.getItem("returnUrl");
-
+ 
       setTimeout(() => {
         if (returnUrl) {
           // User was trying to book - send them back to booking page
@@ -38,10 +38,14 @@ export default function Login() {
         } else {
           // Role-based navigation
           const roleId = result.user.roleId;
-          if (roleId === 4 || roleId === 3) {
+          if (roleId === 4 ) {
             // SUPERADMIN or MANAGER
             navigate("/admin-dashboard");
-          } else if (roleId === 2) {
+          } 
+          else if(roleId==3){
+             navigate("/manager-dashboard");
+          }
+          else if (roleId === 2) {
             // STAFF
             navigate("/staff-dashboard");
           } else {
@@ -50,13 +54,13 @@ export default function Login() {
           }
         }
       }, 1000);
-
+ 
     } catch (error) {
       setMsg("An error occurred. Please try again.");
       setLoading(false);
     }
   };
-
+ 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
@@ -75,18 +79,18 @@ export default function Login() {
             Sign in to access your account
           </p>
         </div>
-
+ 
         {/* Message */}
         {msg && (
           <div className={`p-4 border text-sm font-light text-center animate-fade-in ${
-            msg.includes("Invalid") 
-              ? "bg-red-50 border-red-200 text-red-800" 
+            msg.includes("Invalid")
+              ? "bg-red-50 border-red-200 text-red-800"
               : "bg-neutral-100 border-neutral-200 text-neutral-800"
           }`}>
             {msg}
           </div>
         )}
-
+ 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
@@ -106,7 +110,7 @@ export default function Login() {
                 placeholder="you@example.com"
               />
             </div>
-
+ 
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
@@ -124,7 +128,7 @@ export default function Login() {
               />
             </div>
           </div>
-
+ 
           {/* Forgot Password Link */}
           <div className="text-right">
             <button
@@ -135,7 +139,7 @@ export default function Login() {
               Forgot Password?
             </button>
           </div>
-
+ 
           {/* Submit Button */}
           <button
             type="submit"
@@ -154,7 +158,7 @@ export default function Login() {
               "Sign In"
             )}
           </button>
-
+ 
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
@@ -166,7 +170,7 @@ export default function Login() {
               </span>
             </div>
           </div>
-
+ 
           {/* Create Account Link */}
           <div className="text-center">
             <p className="text-sm text-neutral-600 font-light mb-3">
@@ -181,7 +185,7 @@ export default function Login() {
             </button>
           </div>
         </form>
-
+ 
         {/* Footer */}
         <div className="text-center pt-8">
           <button
@@ -196,3 +200,5 @@ export default function Login() {
     </div>
   );
 }
+ 
+ 
