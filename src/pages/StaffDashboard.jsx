@@ -1,28 +1,41 @@
-import AdminLayout from "../layouts/AdminLayout";
-import Card from "../ui/Card";
-import Table from "../ui/Table";
+import React, { useEffect, useState } from "react";
+import StaffTaskService from "../services/StaffTaskService";
 
-export default function StaffDashboard() {
+function StaffDashboard({ staffId }) {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    StaffTaskService.getTasksByStaff(staffId)
+      .then(res => setTasks(res.data))
+      .catch(err => console.error(err));
+  }, [staffId]);
+
+  const handleStatusChange = (taskId, newStatus) => {
+    StaffTaskService.updateStatus(taskId, newStatus)
+      .then(res => {
+        setTasks(tasks.map(t => t.taskId === taskId ? res.data : t));
+      })
+      .catch(err => console.error(err));
+  };
+
   return (
-    <AdminLayout>
-      <h1 className="text-3xl font-bold mb-10"> Staff Dashboard Overview</h1>
-
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
-        <Card title="Total Rooms">120</Card>
-        <Card title="Active Bookings">45</Card>
-        <Card title="Revenue Today">₹2,90,000</Card>
-      </div>
-
-      <Card title="Recent Bookings">
-        <Table
-          headers={["Guest", "Room", "Status"]}
-          data={[
-            ["Rahul", "Deluxe", "Confirmed"],
-            ["Rishi", "Suite", "Pending"],
-            ["Kunal", "Standard", "Completed"],
-          ]}
-        />
-      </Card>
-    </AdminLayout>
+    <div>
+      <h2>My Tasks</h2>
+      {tasks.map(task => (
+        <div key={task.taskId}>
+          <p>{task.taskType} - {task.status}</p>
+          <select
+            value={task.status}
+            onChange={(e) => handleStatusChange(task.taskId, e.target.value)}
+          >
+            <option value="PENDING">PENDING</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="COMPLETED">COMPLETED</option>
+          </select>
+        </div>
+      ))}
+    </div>
   );
 }
+
+export default StaffDashboard;

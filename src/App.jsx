@@ -9,6 +9,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
 
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
 import Facilities from "./pages/Facilities";
@@ -33,19 +35,30 @@ import RoomRevenueReport from "./pages/reports/RoomRevenueReport";
 import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
-import StaffDashboard from "./pages/StaffDashboard";
+import StaffDashboard from "./components/dashboard/StaffDashboard";
 import MyTickets from "./pages/MyTickets";
 import CreateTicket from "./pages/CreateTicket";
 
 // Admin pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
+//import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
 import FacilityManagement from "./pages/admin/FacilityManagement";
 import CreateFacility from "./pages/admin/CreateFacility";
 import EditFacility from "./pages/admin/EditFacility";
 import RoomManagement from "./pages/admin/RoomManagement";
 
 // Manager Dashboard
-import ManagerDashboard from "./components/dashboard/ManagerDashboard";
+//import ManagerDashboard from "./components/dashboard/ManagerDashboard";
+ import ManagerDashboard from "./pages/ManagerDashboard";
+import RoomPricing from "./pages/reports/RoomPricing";
+import HotelInformation from "./pages/reports/HotelInformation";
+import BookingsReport from "./pages/reports/BookingsReport";
+import StaffEnroll from "./pages/reports/StaffEnroll";
+import ManagerBookingsPage from "./pages/ManagerBookingsPage";
+import ManagerRoomStatusPage from "./pages/ManagerRoomStatusPage";
+import ManagerSupportTasksPage from "./pages/ManagerSupportTasksPage";
+import ManagerReportsPage from "./pages/ManagerReportsPage";
+import ManagerStaffTasksPage from "./pages/ManagerStaffTasksPage";
 
 export default function App() {
     return (
@@ -80,21 +93,53 @@ export default function App() {
                 <Route path="/payment/failed" element={<PaymentFailed />} />
                 <Route path="/my-payments" element={<PaymentHistory />} />
 
-                {/* Report routes */}
+                <Route path="/booking-report" element={<BookingsReport/>} />
+                 <Route path="/enroll-staff" element={<StaffEnroll/>} />
+
+                {/* Admin Dashboard Route */}
+                <Route
+                path="/admin-dashboard"
+                element={
+                    <ProtectedRoute>
+                    <AdminDashboard />
+                    </ProtectedRoute>
+                }
+                />
+                {/* Staff Dashboard Route */}
+                                        <Route
+                        path="/staff-dashboard"
+                        element={
+                            <ProtectedRoute>
+                            <StaffDashboard/>
+                            </ProtectedRoute>
+                        }
+                />
+
+              {/* Report routes */}
                 <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
+                <Route path="/management/pricing" element={<RoomPricing />} />
+                <Route path="/management/branch" element={<HotelInformation />} />
+
+
 
                 {/* Manager Dashboard Route */}
                 <Route
-                    path="/manager/dashboard"
+                    path="/manager-dashboard"
                     element={
                         <ProtectedRoute>
                             <ManagerDashboard />
                         </ProtectedRoute>
                     }
                 />
+
+                <Route path="/manager/bookings" element={<ManagerBookingsPage />} />
+                <Route path="/manager/room-status" element={<ManagerRoomStatusPage />} />
+                <Route path="/manager/support-tickets" element={<ManagerStaffTasksPage />} />
+                 <Route path="/manager/staff-tasks" element={<ManagerStaffTasksPage />} />
+                 <Route path="/manager/reports" element={<ManagerReportsPage />} />
 
                 {/* Support ticket routes */}
                 <Route path="/my-tickets" element={<MyTickets />} />
@@ -161,6 +206,18 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                {/* <Route
+                    path="/manager/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <ManagerDashboard />
+                        </ProtectedRoute>
+                    }
+                /> */}
+
+
+
             </Routes>
         </BrowserRouter>
     );
