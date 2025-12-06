@@ -4,169 +4,153 @@ import { useAuth } from "../../hooks/useAuth";
 import './Login.css';
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [msg, setMsg] = useState("");
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMsg("");
-        setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMsg("");
+    setLoading(true);
 
-        try {
-            const result = await login(email, password);
+    try {
+      const result = await login(email, password);
 
-            if (!result.success) {
-                setMsg(result.error || "Invalid email or password");
-                setLoading(false);
-                return;
-            }
+      if (!result.success) {
+        setMsg(result.error || "Invalid email or password");
+        setLoading(false);
+        return;
+      }
 
-            setMsg("Login Successful. Redirecting...");
+      setMsg("Login Successful. Redirecting...");
 
-            const returnUrl = localStorage.getItem("returnUrl");
+      // Check if user came from booking page
+      const returnUrl = localStorage.getItem("returnUrl");
 
-            setTimeout(() => {
-                if (returnUrl) {
-                    localStorage.removeItem("returnUrl");
-                    navigate(returnUrl);
-                } else {
-                    const roleId = result.user.roleId;
-
-                    // Unified, conflict-free navigation logic
-                    if (roleId === 4) {
-                        // SUPERADMIN
-                        navigate("/admin/dashboard");
-                    } else if (roleId === 3) {
-                        // MANAGER
-                        navigate("/manager/dashboard");
-                    } else if (roleId === 2) {
-                        // STAFF
-                        navigate("/staff-dashboard");
-                    } else {
-                        // CUSTOMER
-                        navigate("/home");
-                    }
-                }
-            }, 1000);
-
-        } catch {
-            setMsg("An error occurred. Please try again.");
-            setLoading(false);
+      setTimeout(() => {
+        if (returnUrl) {
+          // User was trying to book - send them back to booking page
+          localStorage.removeItem("returnUrl");
+          navigate(returnUrl);
+        } else {
+          // Role-based navigation
+          const roleId = result.user.roleId;
+          if (roleId === 4 ) {
+            // SUPERADMIN or MANAGER
+            navigate("/admin-dashboard");
+          }
+          else if(roleId==3){
+             navigate("/manager-dashboard");
+          }
+          else if (roleId === 2) {
+            // STAFF
+            navigate("/staff-dashboard");
+          } else {
+            // CUSTOMER
+            navigate("/home");
+          }
         }
-    };
+      }, 1000);
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 animate-fade-in">
+    } catch (error) {
+      setMsg("An error occurred. Please try again.");
+      setLoading(false);
+    }
+  };
 
-                <div className="text-center">
-                    <div className="inline-block mb-8">
-                        <div className="text-3xl font-light tracking-widest text-neutral-800">
-                            HOTELEASE
-                        </div>
-                        <div className="h-px bg-neutral-300 mt-2"></div>
-                    </div>
-                    <h2 className="text-2xl font-light text-neutral-900 tracking-wide mb-2">
-                        Welcome Back
-                    </h2>
-                    <p className="text-sm text-neutral-600 font-light">
-                        Sign in to access your account
-                    </p>
-                </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 animate-fade-in">
+        {/* Header */}
+        <div className="text-center">
+          <div className="inline-block mb-8">
+            <div className="text-3xl font-light tracking-widest text-neutral-800">
+              HOTELEASE
+            </div>
+            <div className="h-px bg-neutral-300 mt-2"></div>
+          </div>
+          <h2 className="text-2xl font-light text-neutral-900 tracking-wide mb-2">
+            Welcome Back
+          </h2>
+          <p className="text-sm text-neutral-600 font-light">
+            Sign in to access your account
+          </p>
+        </div>
 
-                {msg && (
-                    <div
-                        className={`p-4 border text-sm font-light text-center animate-fade-in ${
-                            msg.includes("Invalid")
-                                ? "bg-red-50 border-red-200 text-red-800"
-                                : "bg-neutral-100 border-neutral-200 text-neutral-800"
-                        }`}
-                    >
-                        {msg}
-                    </div>
-                )}
+        {/* Message */}
+        {msg && (
+          <div className={`p-4 border text-sm font-light text-center animate-fade-in ${
+            msg.includes("Invalid")
+              ? "bg-red-50 border-red-200 text-red-800"
+              : "bg-neutral-100 border-neutral-200 text-neutral-800"
+          }`}>
+            {msg}
+          </div>
+        )}
 
-                <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-                    <div className="space-y-4">
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
-                            >
-                                Email Address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none relative block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
-                                placeholder="you@example.com"
-                            />
-                        </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="appearance-none relative block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
+                placeholder="you@example.com"
+              />
+            </div>
 
-                        <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3"
-                            >
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="appearance-none relative block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                    </div>
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 font-light mb-3">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="appearance-none relative block w-full px-4 py-3 border border-neutral-300 placeholder-neutral-400 text-neutral-900 focus:outline-none focus:border-neutral-500 transition duration-200 font-light"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
 
-                    <div className="text-right">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/forgot-password")}
-                            className="text-xs text-neutral-600 hover:text-neutral-900 transition font-light uppercase tracking-wider"
-                        >
-                            Forgot Password?
-                        </button>
-                    </div>
+          {/* Forgot Password Link */}
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-xs text-neutral-600 hover:text-neutral-900 transition font-light uppercase tracking-wider"
+            >
+              Forgot Password?
+            </button>
+          </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-xs font-light uppercase tracking-widest text-white bg-neutral-800 hover:bg-neutral-900 focus:outline-none transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {loading ? (
-                            <span className="flex items-center">
-                <svg
-                    className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                  <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                  ></circle>
-                  <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-xs font-light uppercase tracking-widest text-white bg-neutral-800 hover:bg-neutral-900 focus:outline-none transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Signing In...
               </span>
@@ -213,3 +197,4 @@ export default function Login() {
         </div>
     );
 }
+

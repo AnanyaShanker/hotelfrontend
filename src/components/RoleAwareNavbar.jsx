@@ -43,20 +43,22 @@ export default function RoleAwareNavbar() {
           >
             Home
           </a>
-
+          {!isStaff() &&(
           <a
             href="/facilities"
             className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
           >
             Facilities
           </a>
-
+)}
+           {!isStaff() &&(
           <a
             href="/rooms"
             className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
           >
             Rooms
           </a>
+          )}
 
           {isAuthenticated && isCustomer() && (
             <>
@@ -84,7 +86,7 @@ export default function RoleAwareNavbar() {
                 Dashboard
               </a>
               <a
-                href="/manage-bookings"
+                href="/admin-dashboard"
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
               >
                 Bookings
@@ -95,19 +97,15 @@ export default function RoleAwareNavbar() {
           {isAuthenticated && isStaff() && (
             <>
               <a
-                href="/staff-tasks"
+                href="/staff-dashboard"
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
               >
                 My Tasks
               </a>
-              <a
-                href="/staff-portal"
-                className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
-              >
-                Portal
-              </a>
+
             </>
           )}
+           {!isStaff() &&(
 
           <a
             href="/gallery"
@@ -115,12 +113,13 @@ export default function RoleAwareNavbar() {
           >
             Gallery
           </a>
+           )}
 
           {/* Login/User Menu */}
           {!isAuthenticated ? (
             <button
               className={`ml-4 px-6 py-2 border font-light text-xs tracking-widest uppercase transition-all ${
-                scrolled 
+                scrolled
                   ? 'border-neutral-800 text-neutral-800 hover:bg-neutral-800 hover:text-white'
                   : 'border-white text-white hover:bg-white hover:text-neutral-800'
               }`}
@@ -176,7 +175,6 @@ export default function RoleAwareNavbar() {
                       Bookings
                     </button>
                   )}
-
                   {isAdmin() && (
                     <button
                       onClick={() => {
@@ -309,3 +307,4 @@ export default function RoleAwareNavbar() {
     </header>
   );
 }
+
