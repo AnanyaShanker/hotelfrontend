@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/AuthService";
+import { useAuth } from "../../context/AuthContext";
 import './Login.css';
  
 export default function Login() {
@@ -9,6 +9,7 @@ export default function Login() {
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,49 +17,46 @@ export default function Login() {
     setLoading(true);
  
     try {
-      const response = await loginUser(email, password);
-      const token = response.data.data.token;
-      const user = response.data.data.user;
+      const result = await login(email, password);
  
-      localStorage.setItem("token", token);
-      localStorage.setItem("roleId", user.roleId);
-      localStorage.setItem("userName", user.name);
+      if (!result.success) {
+        setMsg(result.error || "Invalid email or password");
+        setLoading(false);
+        return;
+      }
  
       setMsg("Login Successful. Redirecting...");
  
+      // Check if user came from booking page
+      const returnUrl = localStorage.getItem("returnUrl");
+ 
       setTimeout(() => {
-        // Role-based navigation
-        const roleId = user.roleId; // use the user you already extracted
-        if (roleId === 4 || roleId === 3) {
-          // SUPERADMIN or MANAGER
-          navigate("/admin-dashboard"); // match your App.js route
-        } else if (roleId === 2) {
-          // STAFF
-          navigate("/staff-dashboard"); // make sure this route exists
+        if (returnUrl) {
+          // User was trying to book - send them back to booking page
+          localStorage.removeItem("returnUrl");
+          navigate(returnUrl);
         } else {
-
-          // CUSTOMER
-          navigate("/home");
-
           // Role-based navigation
           const roleId = result.user.roleId;
-          if (roleId === 4 || roleId === 3) {
+          if (roleId === 4 ) {
             // SUPERADMIN or MANAGER
             navigate("/admin-dashboard");
-          } else if (roleId === 2) {
+          } 
+          else if (roleId === 3) {
+            // STAFF
+            navigate("/manager-dashboard");
+          }else if (roleId === 2) {
             // STAFF
             navigate("/staff-dashboard");
           } else {
             // CUSTOMER
             navigate("/home");
           }
-
         }
       }, 1000);
-      
  
-    } catch {
-      setMsg("Invalid email or password");
+    } catch (error) {
+      setMsg("An error occurred. Please try again.");
       setLoading(false);
     }
   };
@@ -183,9 +181,7 @@ export default function Login() {
               onClick={() => navigate("/add-user")}
               className="text-xs font-light uppercase tracking-widest text-neutral-800 hover:text-neutral-900 border border-neutral-300 hover:border-neutral-400 px-8 py-3 transition inline-block"
             >
-              Create Account 
-            
-
+              Create Account
             </button>
           </div>
         </form>

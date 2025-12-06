@@ -39,12 +39,16 @@ import GuestFeedbackReport from "./pages/reports/GuestFeedbackReport";
 import HousekeepingReport from "./pages/reports/HousekeepingReport";
 
 import AdminDashboard from "./components/dashboard/AdminDashboard";
+import StaffDashboard from "./components/dashboard/StaffDashboard";
 import PaymentList from "./pages/reports/PaymentList";
 import RoomPricing from "./pages/reports/RoomPricing";
 import HotelInformation from "./pages/reports/HotelInformation";
+import BookingsReport from "./pages/reports/BookingsReport";
+import StaffEnroll from "./pages/reports/StaffEnroll";
 
 
-import StaffDashboard from "./pages/StaffDashboard";
+
+
 import MyTickets from "./pages/MyTickets";
 import CreateTicket from "./pages/CreateTicket";
 
@@ -53,6 +57,7 @@ import CreateTicket from "./pages/CreateTicket";
 import FacilityManagement from "./pages/admin/FacilityManagement";
 import CreateFacility from "./pages/admin/CreateFacility";
 import EditFacility from "./pages/admin/EditFacility";
+
 
 
 
@@ -89,22 +94,33 @@ export default function App() {
                 <Route path="/payment/failed" element={<PaymentFailed />} />
                 <Route path="/my-payments" element={<PaymentHistory />} />
                 <Route path="/payments" element={<PaymentList />} />
+                <Route path="/booking-report" element={<BookingsReport />} />
 
                 {/* Report routes */}
                 <Route path="/reports/room-occupancy" element={<RoomOccupancyReport />} />
                 <Route path="/reports/housekeeping" element={<HousekeepingReport />} />
                 <Route path="/reports/room-revenue" element={<RoomRevenueReport />} />
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
-                <Route path="/settings/pricing" element={<RoomPricing />} />
-                <Route path="/settings/hotel" element={<HotelInformation />} />
+                <Route path="/management/pricing" element={<RoomPricing />} />
+                <Route path="/management/branch" element={<HotelInformation />} />
+                <Route path="/enroll-staff" element={<StaffEnroll/>}/>
+              
 
+               
                 
 
                 {/* Support ticket routes */}
                 <Route path="/my-tickets" element={<MyTickets />} />
                 <Route path="/support/create" element={<CreateTicket />} />
 
-                
+                <Route
+  path="/staff-dashboard"
+  element={
+    <ProtectedRoute>
+      <StaffDashboard/>
+    </ProtectedRoute>
+  }
+/>
                 <Route
                     path="/admin/facilities"
                     element={

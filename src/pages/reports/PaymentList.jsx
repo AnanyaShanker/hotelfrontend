@@ -29,7 +29,7 @@ function StatCard({ icon, title, value }) {
   );
 }
 
-export default function PaymentsList() {
+export default function PaymentList() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
