@@ -548,7 +548,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "../../api/axiosConfig";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function StaffDashboard() {
   const { user } = useAuth();
