@@ -673,7 +673,19 @@ export default function StaffDashboard() {
   const assignedDate = normalize(assigned);
   const startDateOnly = start ? normalize(start) : null;
   const endDateOnly = end ? normalize(end) : null;
-
+const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+ 
+ 
+ 
+ <button
+        onClick={handleLogout}
+        className="fixed top-4 right-4 z-50 text-neutral-700 hover:text-neutral-900 font-semibold text-lg tracking-wide uppercase px-6 py-3 transition-transform duration-200 hover:scale-105"
+      >
+        Logout
+      </button>
   if (startDateOnly && assignedDate < startDateOnly) return false;
   if (endDateOnly && assignedDate > endDateOnly) return false;
 
@@ -734,8 +746,12 @@ export default function StaffDashboard() {
                   onClick={() => (window.location.href = "/logout")}
                   className="w-full text-left text-sm text-neutral-800 py-2 hover:text-neutral-600"
                 >
+                 
+
+                  
                   Logout
                 </button>
+                
               </div>
             )}
           </div>
@@ -803,7 +819,7 @@ export default function StaffDashboard() {
               </label>
               <input
                 type="text"
-                placeholder="Search Room / Task Type"
+                placeholder="Search Task"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border border-neutral-300 px-3 py-2 text-sm"

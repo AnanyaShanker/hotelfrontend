@@ -30,43 +30,102 @@ export default function PaymentHistory() {
   const fetchPayments = async () => {
     setLoading(true);
     try {
+      console.log(' Fetching payment history for user:', user.userId);
       const result = await paymentService.getPaymentHistory(user.userId);
       if (result.success) {
+        console.log(' Payment history received:', result.data);
+
         // Sort by date (newest first)
         const sortedPayments = result.data.sort((a, b) =>
           new Date(b.paymentDate) - new Date(a.paymentDate)
         );
-        setPayments(sortedPayments);
+
+        // Filter out failed attempts if successful payment exists for same booking
+        const filteredPayments = filterDuplicateBookingAttempts(sortedPayments);
+
+        console.log(` Total payments: ${sortedPayments.length}, After filtering: ${filteredPayments.length}`);
+        setPayments(filteredPayments);
       }
     } catch (error) {
-      console.error('Error loading payments:', error);
+      console.error(' Error loading payments:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Filter out failed payment attempts if a successful payment exists for the same booking.
+   * This prevents showing "Retry" buttons for bookings that have already been paid.
+   */
+  const filterDuplicateBookingAttempts = (payments) => {
+    // Group payments by booking ID
+    const bookingGroups = {};
+
+    payments.forEach(payment => {
+      // Create a unique key for room or facility booking
+      const bookingKey = payment.bookingId
+        ? `room_${payment.bookingId}`
+        : `facility_${payment.facilityBookingId}`;
+
+      if (!bookingGroups[bookingKey]) {
+        bookingGroups[bookingKey] = [];
+      }
+      bookingGroups[bookingKey].push(payment);
+    });
+
+    console.log(' Booking groups:', bookingGroups);
+
+    // For each booking, check if a successful payment exists
+    const filteredPayments = [];
+
+    Object.entries(bookingGroups).forEach(([bookingKey, bookingPayments]) => {
+      // Check if there's a successful payment for this booking
+      const hasSuccessfulPayment = bookingPayments.some(p =>
+        p.status?.toUpperCase() === 'SUCCESS'
+      );
+
+      if (hasSuccessfulPayment) {
+        console.log(` ${bookingKey}: Has successful payment - showing only SUCCESS attempts`);
+        // Only show successful payments (hide all failed/pending attempts)
+        filteredPayments.push(...bookingPayments.filter(p =>
+          p.status?.toUpperCase() === 'SUCCESS'
+        ));
+      } else {
+        console.log(` ${bookingKey}: No successful payment - showing all attempts`);
+        // No successful payment yet, show all attempts (including failed with retry button)
+        filteredPayments.push(...bookingPayments);
+      }
+    });
+
+    return filteredPayments;
+  };
+
+  // Helper function to check if payment is truly failed
+  const isPaymentFailed = (payment) => {
+    const status = payment.status;
+
+    // Normalize status check (case-insensitive)
+    const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status;
+
+    const isFailed = normalizedStatus === 'FAILED';
+    const isSuccess = normalizedStatus === 'SUCCESS';
+
+    // Return true ONLY if status is FAILED and NOT SUCCESS
+    return isFailed && !isSuccess;
+  };
+
+  // Filter payments by status
   const filteredPayments = payments.filter((payment) => {
     if (filter === 'all') return true;
-    if (filter === 'success') return payment.status === 'SUCCESS';
-    if (filter === 'failed') return payment.status === 'FAILED';
-    if (filter === 'pending') return payment.status === 'PENDING';
+    const normalizedStatus = payment.status?.toUpperCase();
+    if (filter === 'success') return normalizedStatus === 'SUCCESS';
+    if (filter === 'failed') return normalizedStatus === 'FAILED';
+    if (filter === 'pending') return normalizedStatus === 'PENDING';
     return true;
   });
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      SUCCESS: 'bg-green-100 text-green-800',
-      FAILED: 'bg-red-100 text-red-800',
-      PENDING: 'bg-yellow-100 text-yellow-800'
-    };
-    return (
-      <span className={`px-3 py-1 text-xs font-semibold uppercase ${styles[status] || 'bg-neutral-100 text-neutral-800'}`}>
-        {status}
-      </span>
-    );
-  };
-
   const handleRetry = (payment) => {
+    console.log(' Retry button clicked for payment:', payment.paymentId, 'Status:', payment.status);
     const bookingType = payment.bookingId ? 'room' : 'facility';
     const bookingId = payment.bookingId || payment.facilityBookingId;
 
@@ -89,6 +148,20 @@ export default function PaymentHistory() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const getStatusBadge = (status) => {
+    const normalizedStatus = status?.toUpperCase();
+    const styles = {
+      SUCCESS: 'bg-green-100 text-green-800 border-green-300',
+      FAILED: 'bg-red-100 text-red-800 border-red-300',
+      PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-300'
+    };
+    return (
+      <span className={`px-3 py-1 text-xs uppercase tracking-wider font-light border ${styles[normalizedStatus] || 'bg-neutral-100 text-neutral-800 border-neutral-300'}`}>
+        {status}
+      </span>
+    );
   };
 
   if (!user) {
@@ -183,7 +256,7 @@ export default function PaymentHistory() {
                       <td className="px-4 py-3">{getStatusBadge(payment.status)}</td>
                       <td className="px-4 py-3 text-xs text-neutral-600 font-mono">{payment.transactionId}</td>
                       <td className="px-4 py-3">
-                        {payment.status === 'FAILED' && (
+                        {isPaymentFailed(payment) && (
                           <button
                             className="text-xs px-3 py-1 bg-neutral-800 text-white hover:bg-neutral-900 uppercase tracking-wider"
                             onClick={() => handleRetry(payment)}
@@ -214,14 +287,14 @@ export default function PaymentHistory() {
                     {getStatusBadge(payment.status)}
                   </div>
 
-                  <div className="space-y-1 text-xs">
-                    <p><span className="text-neutral-600">Booking:</span> #{payment.bookingId || payment.facilityBookingId}</p>
+                  <div className="text-xs text-neutral-700 space-y-1">
+                    <p><span className="text-neutral-600">Booking ID:</span> #{payment.bookingId || payment.facilityBookingId}</p>
                     <p><span className="text-neutral-600">Type:</span> {payment.bookingId ? 'Room' : 'Facility'}</p>
                     <p><span className="text-neutral-600">Method:</span> {payment.paymentMethod}</p>
                     <p><span className="text-neutral-600">Transaction:</span> {payment.transactionId}</p>
                   </div>
 
-                  {payment.status === 'FAILED' && (
+                  {isPaymentFailed(payment) && (
                     <button
                       className="mt-3 w-full text-xs px-3 py-2 bg-neutral-800 text-white hover:bg-neutral-900 uppercase tracking-wider"
                       onClick={() => handleRetry(payment)}
@@ -253,10 +326,7 @@ export default function PaymentHistory() {
             <div className="bg-neutral-50 border border-neutral-200 p-4 text-center">
               <p className="text-xs uppercase tracking-widest text-neutral-600 font-light mb-1">Total Paid</p>
               <p className="text-2xl font-light text-neutral-900">
-                ₹{payments
-                  .filter(p => p.status === 'SUCCESS')
-                  .reduce((sum, p) => sum + parseFloat(p.amountPaid), 0)
-                  .toFixed(2)}
+                ₹{payments.filter(p => p.status === 'SUCCESS').reduce((sum, p) => sum + parseFloat(p.amountPaid), 0).toFixed(2)}
               </p>
             </div>
           </div>

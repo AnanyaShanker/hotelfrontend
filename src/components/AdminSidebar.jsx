@@ -11,6 +11,8 @@ export default function AdminSidebar({ isOpen, onClose }) {
     { label: "Bookings", path: "/booking-report" },
     { label: "Customers", path: "/users" },
     { label: "Payments", path: "/payments" },
+     { label: "Activity Logs", path: "/admin/activity-logs", icon: "📋" },
+    { label: "Gallery", path: "/admin/gallery" },
     { label: "Reports", path: null },
     { label: "Management", path: null },
     { label: "Staff", path: "/enroll-staff" },

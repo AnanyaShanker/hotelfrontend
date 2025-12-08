@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
  
 export default function RoomPricing() {
+  const navigate = useNavigate();
+ 
   const [rooms, setRooms] = useState([]);
   const [branches, setBranches] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -18,33 +21,26 @@ export default function RoomPricing() {
     floorNumber: "",
   });
  
-  // local state to edit prices per room
   const [priceEdits, setPriceEdits] = useState({});
  
-  // FETCH ROOMS + BRANCHES + ROOM TYPES
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const headers = {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        };
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
         const [roomsRes, branchesRes, typesRes] = await Promise.all([
           axios.get("http://localhost:9193/api/rooms", { headers }),
           axios.get("http://localhost:9193/api/branches", { headers }),
           axios.get("http://localhost:9193/api/roomtypes", { headers }),
         ]);
+ 
         setRooms(roomsRes.data);
         setBranches(branchesRes.data);
         setRoomTypes(typesRes.data);
  
-        // init price edits from rooms
         const initialPrices = {};
-        roomsRes.data.forEach((r) => {
-          initialPrices[r.roomId] = r.pricePerNight;
-        });
+        roomsRes.data.forEach((r) => (initialPrices[r.roomId] = r.pricePerNight));
         setPriceEdits(initialPrices);
-      } catch (err) {
-        console.error("❌ Error fetching data:", err);
+      } catch {
         setError("Failed to load data");
       } finally {
         setLoading(false);
@@ -53,22 +49,14 @@ export default function RoomPricing() {
     fetchData();
   }, []);
  
-  // ADD ROOM
   const addRoom = async () => {
     try {
-      const headers = {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      };
-      const res = await axios.post(
-        "http://localhost:9193/api/rooms",
-        newRoom,
-        { headers }
-      );
+      const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+      const res = await axios.post("http://localhost:9193/api/rooms", newRoom, { headers });
+ 
       setRooms((prev) => [...prev, res.data]);
-      setPriceEdits((prev) => ({
-        ...prev,
-        [res.data.roomId]: res.data.pricePerNight,
-      }));
+      setPriceEdits((prev) => ({ ...prev, [res.data.roomId]: res.data.pricePerNight }));
+ 
       alert("Room added successfully!");
       setNewRoom({
         roomNumber: "",
@@ -77,142 +65,97 @@ export default function RoomPricing() {
         capacity: "",
         branchId: "",
         typeId: "",
+        floorNumber: "",
       });
-    } catch (err) {
-      console.error("❌ Error adding room:", err);
+    } catch {
       alert("Failed to add room");
     }
   };
  
-  // UPDATE PRICE
   const updatePrice = async (roomId) => {
     const newPrice = priceEdits[roomId];
-    if (newPrice === "" || newPrice == null) {
-      alert("Please enter a valid price");
+    if (!newPrice) {
+      alert("Enter valid price");
       return;
     }
- 
     try {
-      const headers = {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      };
+      const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
       const room = rooms.find((r) => r.roomId === roomId);
-      if (!room) {
-        alert("Room not found");
-        return;
-      }
- 
       const updatedRoom = { ...room, pricePerNight: Number(newPrice) };
  
-      await axios.put(
-        `http://localhost:9193/api/rooms/${roomId}`,
-        updatedRoom,
-        { headers }
-      );
+      await axios.put(`http://localhost:9193/api/rooms/${roomId}`, updatedRoom, { headers });
  
       setRooms((prev) =>
-        prev.map((r) =>
-          r.roomId === roomId ? { ...r, pricePerNight: Number(newPrice) } : r
-        )
+        prev.map((r) => (r.roomId === roomId ? { ...r, pricePerNight: updatedRoom.pricePerNight } : r))
       );
-      alert("Price updated successfully!");
-    } catch (err) {
-      console.error("❌ Error updating price:", err);
+ 
+      alert("Price updated");
+    } catch {
       alert("Failed to update price");
     }
   };
  
-  // REMOVE ROOM
-  const removeRoom = async (roomId) => {
-    if (!window.confirm("Remove this room from availability?")) return;
+  // AVAILABLE ↔ RESERVED
+  const toggleRoomStatus = async (roomId, currentStatus) => {
+    const newStatus = currentStatus === "AVAILABLE" ? "RESERVED" : "AVAILABLE";
     try {
-      const headers = {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      };
-      await axios.delete(`http://localhost:9193/api/rooms/${roomId}`, {
-        headers,
-      });
-      setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
-      setPriceEdits((prev) => {
-        const copy = { ...prev };
-        delete copy[roomId];
-        return copy;
-      });
-      alert("Room removed successfully!");
-    } catch (err) {
-      console.error("❌ Error removing room:", err);
-      alert("Failed to remove room");
+      const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+      await axios.patch(
+        `http://localhost:9193/api/rooms/${roomId}/status`,
+        { status: newStatus },
+        { headers }
+      );
+ 
+      setRooms((prev) =>
+        prev.map((r) => (r.roomId === roomId ? { ...r, status: newStatus } : r))
+      );
+    } catch {
+      alert("Failed to update room status");
     }
   };
  
-  if (loading) return <p className="p-6 text-neutral-600">Loading...</p>;
+  if (loading) return <p className="p-6 text-neutral-600 animate-pulse">Loading...</p>;
   if (error) return <p className="p-6 text-red-600">{error}</p>;
  
   return (
-    <section className="p-10 bg-neutral-50 min-h-screen space-y-12">
-      {/* Header */}
-      <header>
-        <h1 className="text-3xl font-light tracking-wide text-neutral-800">
-          Room &amp; Pricing Management
+    <section className="px-10 py-20 bg-neutral-50 min-h-screen space-y-20 animate-fade-in">
+      <button
+        onClick={() => navigate("/admin-dashboard")}
+        className="px-6 py-2 bg-neutral-800 text-white rounded uppercase tracking-wide text-sm hover:bg-neutral-900 transition"
+      >
+        ⬅ Back to Dashboard
+      </button>
+ 
+      <header className="text-center">
+        <h1 className="text-4xl font-light tracking-wide text-neutral-900 mb-2">
+          Room & Pricing Management
         </h1>
-        <p className="text-sm text-neutral-500 font-light mt-1">
-          SuperAdmin — Add rooms, assign types, change pricing, remove rooms
+        <p className="text-neutral-600 text-base font-light">
+          Add rooms, manage pricing, and block rooms when unavailable
         </p>
       </header>
  
-      {/* Add Room Form */}
-      <div className="bg-white border border-neutral-200 shadow-sm p-8 rounded-xl space-y-6">
-        <h2 className="text-lg font-medium text-neutral-800">Add New Room</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            placeholder="Room Number"
-            value={newRoom.roomNumber}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, roomNumber: e.target.value })
-            }
-          />
-          <input
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            placeholder="Description"
-            value={newRoom.description}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, description: e.target.value })
-            }
-          />
-          <input
-            type="number"
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            placeholder="Price Per Night"
-            value={newRoom.pricePerNight}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, pricePerNight: e.target.value })
-            }
-          />
-          <input
-            type="number"
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            placeholder="Capacity"
-            value={newRoom.capacity}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, capacity: e.target.value })
-            }
-          />
-          <input
-            type="number"
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            placeholder="Floor Number"
-            value={newRoom.floorNumber}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, floorNumber: e.target.value })
-            }
-          />
+      {/* ADD ROOM */}
+      <div className="bg-white p-12 rounded-2xl shadow-sm border border-neutral-200 space-y-8 animate-fade-in-up">
+        <h2 className="text-2xl font-light text-neutral-800 tracking-wide text-center">
+          ➕ Add New Room
+        </h2>
+ 
+        <div className="grid md:grid-cols-2 gap-6">
+          {["roomNumber", "description", "pricePerNight", "capacity", "floorNumber"].map((field) => (
+            <input
+              key={field}
+              className="border border-neutral-300 px-4 py-3 rounded text-neutral-700 focus:ring-2 focus:ring-neutral-700 outline-none"
+              placeholder={field.replace(/^\w/, (c) => c.toUpperCase())}
+              value={newRoom[field]}
+              onChange={(e) => setNewRoom({ ...newRoom, [field]: e.target.value })}
+            />
+          ))}
+ 
           <select
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="border border-neutral-300 px-4 py-3 rounded text-neutral-700"
             value={newRoom.branchId}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, branchId: e.target.value })
-            }
+            onChange={(e) => setNewRoom({ ...newRoom, branchId: e.target.value })}
           >
             <option value="">Select Branch</option>
             {branches.map((b) => (
@@ -221,12 +164,11 @@ export default function RoomPricing() {
               </option>
             ))}
           </select>
+ 
           <select
-            className="border border-neutral-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="border border-neutral-300 px-4 py-3 rounded text-neutral-700"
             value={newRoom.typeId}
-            onChange={(e) =>
-              setNewRoom({ ...newRoom, typeId: e.target.value })
-            }
+            onChange={(e) => setNewRoom({ ...newRoom, typeId: e.target.value })}
           >
             <option value="">Select Room Type</option>
             {roomTypes.map((t) => (
@@ -236,92 +178,100 @@ export default function RoomPricing() {
             ))}
           </select>
         </div>
+ 
         <button
           onClick={addRoom}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          className="px-10 py-3 bg-neutral-900 text-white font-light uppercase tracking-wider rounded hover:bg-neutral-800 transition"
         >
-          ➕ Add Room
+          Add Room
         </button>
       </div>
  
-      {/* Rooms Table */}
-      <div className="bg-white border border-neutral-200 shadow-sm rounded-xl overflow-hidden">
+      {/* ROOMS TABLE */}
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden animate-fade-in-up">
         <table className="w-full">
-          <thead className="bg-neutral-100 text-neutral-600 text-xs uppercase tracking-wider">
+          <thead className="bg-neutral-100 text-neutral-700 text-[11px] uppercase tracking-widest font-light">
             <tr>
-              <th className="px-4 py-2 text-left font-semibold">ID</th>
-              <th className="px-4 py-2 text-left font-semibold">Room No</th>
-              <th className="px-4 py-2 text-left font-semibold">Description</th>
-              <th className="px-4 py-2 text-left font-semibold">Branch</th>
-              <th className="px-4 py-2 text-left font-semibold">Type</th>
-              <th className="px-4 py-2 text-left font-semibold">Price / Night</th>
-              <th className="px-4 py-2 text-center font-semibold">Actions</th>
+              {["ID", "Room No", "Branch", "Type", "Price", "Status", "Action"].map((col) => (
+                <th key={col} className="px-5 py-4 text-left">
+                  {col}
+                </th>
+              ))}
             </tr>
           </thead>
+ 
           <tbody>
             {rooms.map((room, idx) => (
               <tr
                 key={room.roomId}
-                className={`${
-                  idx % 2 === 0 ? "bg-white" : "bg-neutral-50"
-                } hover:bg-blue-50 transition`}
+                className={`${idx % 2 === 0 ? "bg-white" : "bg-neutral-50"} hover:bg-neutral-100 transition`}
               >
-                <td className="px-4 py-2 text-sm">{room.roomId}</td>
-                <td className="px-4 py-2 text-sm font-medium">
-                  {room.roomNumber}
+                <td className="px-5 py-4 text-sm">{room.roomId}</td>
+                <td className="px-5 py-4 text-sm font-light">{room.roomNumber}</td>
+                <td className="px-5 py-4 text-sm font-light">
+                  {branches.find((b) => b.branchId === room.branchId)?.name || "Unknown"}
                 </td>
-                <td className="px-4 py-2 text-sm">{room.description}</td>
-                <td className="px-4 py-2 text-sm">
-                  {branches.find((b) => b.branchId === room.branchId)?.name ||
-                    "Unknown"}
+                <td className="px-5 py-4 text-sm font-light">
+                  {roomTypes.find((t) => t.typeId === room.typeId)?.typeName || "Unknown"}
                 </td>
-                <td className="px-4 py-2 text-sm">
-                  {roomTypes.find((t) => t.typeId === room.typeId)?.typeName ||
-                    "Unknown"}
+ 
+                {/* Price hidden when RESERVED */}
+                <td className="px-5 py-4 text-sm font-light">
+                  {room.status === "RESERVED" ? (
+                    <span className="text-neutral-400 text-xs italic">Room is reserved</span>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        className="w-28 border border-neutral-300 px-2 py-1 rounded text-sm"
+                        value={priceEdits[room.roomId] ?? ""}
+                        onChange={(e) =>
+                          setPriceEdits((prev) => ({ ...prev, [room.roomId]: e.target.value }))
+                        }
+                      />
+                      <button
+                        onClick={() => updatePrice(room.roomId)}
+                        className="px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+                      >
+                        Update
+                      </button>
+                    </div>
+                  )}
                 </td>
-                <td className="px-4 py-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      className="w-24 border border-neutral-300 px-2 py-1 rounded text-sm"
-                      value={
-                        priceEdits[room.roomId] ?? room.pricePerNight ?? ""
-                      }
-                      onChange={(e) =>
-                        setPriceEdits((prev) => ({
-                          ...prev,
-                          [room.roomId]: e.target.value,
-                        }))
-                      }
-                    />
-                    <span className="text-neutral-500 text-xs">₹</span>
-                  </div>
+ 
+                {/* Status */}
+                <td className="px-5 py-4">
+                  {room.status === "AVAILABLE" ? (
+                    <span className="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+                      AVAILABLE
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+                      RESERVED
+                    </span>
+                  )}
                 </td>
-                <td className="px-4 py-2 text-sm text-center">
-                  <div className="flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => updatePrice(room.roomId)}
-                      className="px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 transition"
-                    >
-                      Update
-                    </button>
-                    <button
-                      onClick={() => removeRoom(room.roomId)}
-                      className="px-3 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700 transition"
-                    >
-                      Remove
-                    </button>
-                  </div>
+ 
+                {/* Toggle */}
+                <td className="px-5 py-4">
+                  <button
+                    onClick={() => toggleRoomStatus(room.roomId, room.status)}
+                    className={`px-3 py-1 text-white text-xs rounded transition ${
+                      room.status === "AVAILABLE"
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                  >
+                    {room.status === "AVAILABLE" ? "Reserved" : "Make Available"}
+                  </button>
                 </td>
               </tr>
             ))}
+ 
             {rooms.length === 0 && (
               <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-6 text-center text-neutral-500 text-sm"
-                >
-                  No rooms found. Add a new room above.
+                <td className="px-5 py-10 text-center text-neutral-500 font-light" colSpan={7}>
+                  No rooms yet — add one above
                 </td>
               </tr>
             )}
@@ -331,5 +281,3 @@ export default function RoomPricing() {
     </section>
   );
 }
- 
- 

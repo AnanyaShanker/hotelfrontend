@@ -7,10 +7,9 @@ import UsersList from "./components/users/UsersList";
 import AddUser from "./components/users/AddUser";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
-
-
+import PaymentList from "./pages/reports/PaymentList";
+import GalleryManagement from "./pages/admin/GalleryManagement";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
 
 import Gallery from "./pages/Gallery";
 import FeedbackForm from "./pages/FeedbackForm";
@@ -19,6 +18,7 @@ import FacilityDetails from "./pages/FacilityDetails";
 import BookFacility from "./pages/BookFacility";
 import MyFacilityBookings from "./pages/MyFacilityBookings";
 import MyBookings from "./pages/MyBookings";
+
 
 // Room Booking pages
 import Rooms from "./pages/Rooms";
@@ -61,6 +61,8 @@ import ManagerSupportTasksPage from "./pages/ManagerSupportTasksPage";
 import ManagerReportsPage from "./pages/ManagerReportsPage";
 import ManagerStaffTasksPage from "./pages/ManagerStaffTasksPage";
 
+
+
 export default function App() {
     return (
         <BrowserRouter>
@@ -80,7 +82,7 @@ export default function App() {
                 <Route path="/facility/:id" element={<FacilityDetails />} />
                 <Route path="/book-facility/:id" element={<BookFacility />} />
                 <Route path="/my-facility-bookings" element={<MyFacilityBookings />} />
-
+<Route path="/payments" element={<PaymentList/>}/>
                 {/* Room Booking routes */}
                 <Route path="/rooms" element={<Rooms />} />
                 <Route path="/book-room" element={<BookRoom />} />
@@ -138,7 +140,7 @@ export default function App() {
 
                 <Route path="/manager/bookings" element={<ManagerBookingsPage />} />
                 <Route path="/manager/room-status" element={<ManagerRoomStatusPage />} />
-                <Route path="/manager/support-tickets" element={<ManagerStaffTasksPage />} />
+                <Route path="/manager/support-tickets" element={<ManagerSupportTasksPage />} />
                  <Route path="/manager/staff-tasks" element={<ManagerStaffTasksPage />} />
                  <Route path="/manager/reports" element={<ManagerReportsPage />} />
 
@@ -184,6 +186,15 @@ export default function App() {
                     element={
                         <ProtectedRoute>
                             <RoomManagement />
+                        </ProtectedRoute>
+                    }
+                />
+
+                 <Route
+                    path="/admin/gallery"
+                    element={
+                        <ProtectedRoute>
+                            <GalleryManagement />
                         </ProtectedRoute>
                     }
                 />

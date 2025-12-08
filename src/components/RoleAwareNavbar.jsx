@@ -1,27 +1,27 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-
+ 
 export default function RoleAwareNavbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, getRoleName, isAdmin, isStaff, isCustomer, hasRole } = useAuth();
-
+ 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
+ 
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    navigate("/");
+    navigate("/login");
   };
-
+ 
   return (
     <header
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -34,7 +34,7 @@ export default function RoleAwareNavbar() {
             HOTELEASE
           </div>
         </div>
-
+ 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8 text-xs font-light uppercase tracking-widest">
           <a
@@ -59,7 +59,7 @@ export default function RoleAwareNavbar() {
             Rooms
           </a>
           )}
-
+ 
           {isAuthenticated && isCustomer() && (
             <>
               <a
@@ -76,7 +76,7 @@ export default function RoleAwareNavbar() {
               </a>
             </>
           )}
-
+ 
           {isAuthenticated && isAdmin() && (
             <>
               <a
@@ -93,7 +93,7 @@ export default function RoleAwareNavbar() {
               </a>
             </>
           )}
-
+ 
           {isAuthenticated && isStaff() && (
             <>
               <a
@@ -102,11 +102,11 @@ export default function RoleAwareNavbar() {
               >
                 My Tasks
               </a>
-
+ 
             </>
           )}
            {!isStaff() &&(
-
+ 
           <a
             href="/gallery"
             className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
@@ -114,7 +114,7 @@ export default function RoleAwareNavbar() {
             Gallery
           </a>
            )}
-
+ 
           {/* Login/User Menu */}
           {!isAuthenticated ? (
             <button
@@ -146,14 +146,14 @@ export default function RoleAwareNavbar() {
                   <div className="text-xs font-light">{user?.name?.split(' ')[0]}</div>
                 </div>
               </button>
-
+ 
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-200 py-2">
                   <div className="px-4 py-3 border-b border-neutral-200">
                     <p className="text-xs font-light text-neutral-800">{user?.name}</p>
                     <p className="text-xs text-neutral-500 mt-1">{getRoleName(user?.roleId)}</p>
                   </div>
-
+ 
                   <button
                     onClick={() => {
                       navigate("/profile");
@@ -163,7 +163,7 @@ export default function RoleAwareNavbar() {
                   >
                     Profile
                   </button>
-
+ 
                   {isCustomer() && (
                     <button
                       onClick={() => {
@@ -175,6 +175,7 @@ export default function RoleAwareNavbar() {
                       Bookings
                     </button>
                   )}
+                 
                   {isAdmin() && (
                     <button
                       onClick={() => {
@@ -187,7 +188,7 @@ export default function RoleAwareNavbar() {
                       Dashboard
                     </button>
                   )}
-
+ 
                   {isStaff() && (
                     <button
                       onClick={() => {
@@ -199,9 +200,9 @@ export default function RoleAwareNavbar() {
                       Tasks
                     </button>
                   )}
-
+ 
                   <div className="border-t border-neutral-200 my-2"></div>
-
+ 
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
@@ -213,7 +214,7 @@ export default function RoleAwareNavbar() {
             </div>
           )}
         </nav>
-
+ 
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center">
           <button
@@ -246,7 +247,7 @@ export default function RoleAwareNavbar() {
           </button>
         </div>
       </div>
-
+ 
       {/* Mobile menu */}
       <div
         className={`md:hidden bg-white border-t border-neutral-200 transition-all duration-300 overflow-hidden ${
@@ -260,30 +261,30 @@ export default function RoleAwareNavbar() {
               <p className="text-xs text-neutral-500 mt-1">{getRoleName(user.roleId)}</p>
             </div>
           )}
-
+ 
           <a href="/" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Home</a>
           <a href="/facilities" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Facilities</a>
-
+ 
           {isAuthenticated && isCustomer() && (
             <a href="/my-bookings" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">My Bookings</a>
           )}
-
+ 
           {isAuthenticated && isAdmin() && (
             <>
               <a href={hasRole('MANAGER') ? '/manager/dashboard' : '/admin/dashboard'} className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Dashboard</a>
               <a href="/manage-bookings" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Bookings</a>
             </>
           )}
-
+ 
           {isAuthenticated && isStaff() && (
             <>
               <a href="/staff-tasks" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">My Tasks</a>
               <a href="/staff-portal" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Portal</a>
             </>
           )}
-
+ 
           <a href="/gallery" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Gallery</a>
-
+ 
           {!isAuthenticated ? (
             <button
               className="mt-2 px-6 py-3 border border-neutral-800 text-neutral-800 text-xs font-light uppercase tracking-wider hover:bg-neutral-800 hover:text-white transition"
@@ -307,4 +308,3 @@ export default function RoleAwareNavbar() {
     </header>
   );
 }
-
