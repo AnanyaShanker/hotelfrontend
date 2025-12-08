@@ -149,15 +149,6 @@ export default function RoleAwareNavbar() {
                     <p className="text-xs text-neutral-500 mt-1">{getRoleName(user?.roleId)}</p>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      navigate("/profile");
-                      setShowUserMenu(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
-                  >
-                    Profile
-                  </button>
 
                   {isCustomer() && (
                     <>
@@ -302,15 +293,12 @@ export default function RoleAwareNavbar() {
               Login
             </button>
           ) : (
-            <>
-              <a href="/profile" className="py-2 text-xs text-neutral-700 font-light uppercase tracking-wider hover:text-neutral-400 transition">Profile</a>
-              <button
-                onClick={handleLogout}
-                className="mt-2 px-6 py-3 border border-neutral-800 text-neutral-800 text-xs font-light uppercase tracking-wider hover:bg-neutral-800 hover:text-white transition"
-              >
-                Logout
-              </button>
-            </>
+            <button
+              onClick={handleLogout}
+              className="mt-2 px-6 py-3 border border-neutral-800 text-neutral-800 text-xs font-light uppercase tracking-wider hover:bg-neutral-800 hover:text-white transition"
+            >
+              Logout
+            </button>
           )}
         </div>
       </div>
