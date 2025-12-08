@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
- 
+
 export default function AdminTopbar({ onMenuClick }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
- 
+
   const handleLogout = () => {
     // Clear token or any auth info
     localStorage.removeItem("token");
     // Redirect to login page
     navigate("/login");
   };
- 
+
   return (
     <header className="h-[72px] bg-white shadow-md flex items-center justify-between px-6 relative">
       <div className="flex items-center gap-4">
@@ -38,7 +38,7 @@ export default function AdminTopbar({ onMenuClick }) {
         </button>
         <h1 className="text-lg font-bold tracking-tight">Admin Dashboard</h1>
       </div>
- 
+
       <div className="flex items-center gap-4">
         <div className="text-right hidden sm:block">
           <p className="text-sm font-semibold">
@@ -48,7 +48,7 @@ export default function AdminTopbar({ onMenuClick }) {
             {user ? user.email : "admin@hotelease.com"}
           </p>
         </div>
- 
+
         {/* Avatar with dropdown */}
         <div className="relative">
           <button
@@ -57,7 +57,7 @@ export default function AdminTopbar({ onMenuClick }) {
           >
             {user ? user.name?.charAt(0).toUpperCase() : "A"}
           </button>
- 
+
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg p-4">
               <p className="text-sm font-semibold text-gray-900">

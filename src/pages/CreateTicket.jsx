@@ -43,7 +43,7 @@ export default function CreateTicket() {
 
     axios
       .post("/api/support", dto)
-      .then(() => navigate("/support-tickets"))
+      .then(() => navigate("/my-tickets"))
       .catch((err) => console.error(err));
   };
 

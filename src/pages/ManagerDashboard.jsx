@@ -6,13 +6,13 @@ import { useAuth } from "../hooks/useAuth";
 export default function ManagerDashboard() {
   const navigate = useNavigate();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
- 
+
   const [branch, setBranch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
- 
+
   const token = localStorage.getItem("token");
- 
+
   // ---------------------------
   // Fetch Manager's Branch
   // ---------------------------
@@ -69,7 +69,7 @@ export default function ManagerDashboard() {
           <div className="text-xl tracking-wide font-light text-neutral-900 cursor-pointer">
             HOTELEASE
           </div>
- 
+
           {/* PROFILE DROPDOWN */}
           <div className="relative">
             <button
@@ -81,14 +81,13 @@ export default function ManagerDashboard() {
               </div>
               <span className="text-sm">{user?.name}</span>
             </button>
- 
+
             {showMenu && (
               <div className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 shadow-lg p-4 animate-fade-in">
                 <div className="text-neutral-900 font-light mb-1">{user?.name}</div>
                 <div className="text-neutral-500 text-xs uppercase tracking-wider mb-4">
                   Manager
                 </div>
- 
                 <button
                   onClick={handleLogout}
                   className="w-full text-left text-sm text-neutral-800 py-2 hover:text-neutral-600"
@@ -100,7 +99,7 @@ export default function ManagerDashboard() {
           </div>
         </div>
       </header>
- 
+
       {/* -------------------------------------- */}
       {/* MAIN CONTENT */}
       {/* -------------------------------------- */}
@@ -109,10 +108,9 @@ export default function ManagerDashboard() {
         <h1 className="text-3xl font-light text-neutral-900 mb-8 tracking-wide">
           Manager Dashboard — {branch?.name}
         </h1>
- 
+
         {/* GRID OF PANELS (Same style as staff dashboard section cards) */}
         <section className="grid md:grid-cols-2 gap-10">
- 
           <DashboardCard
             title="🛏️ Branch Bookings"
             desc="View and manage all guest bookings for this branch."
@@ -140,7 +138,6 @@ export default function ManagerDashboard() {
             btn="View Staff Tasks"
             action={() => navigate(`/manager/staff-tasks?branchId=${branch.branchId}`)}
           />
- 
         </section>
       </main>
     </div>
@@ -157,7 +154,6 @@ function DashboardCard({ title, desc, btn, action }) {
         {title}
       </h3>
       <p className="text-neutral-700 font-light text-sm mb-6">{desc}</p>
- 
       <button
         onClick={action}
         className="px-6 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
@@ -167,4 +163,3 @@ function DashboardCard({ title, desc, btn, action }) {
     </div>
   );
 }
- 

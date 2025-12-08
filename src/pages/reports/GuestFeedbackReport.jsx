@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosConfig";
- 
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -10,11 +10,11 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
- 
+
 import { Pie } from "react-chartjs-2";
- 
+
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
- 
+
 // ---------------------------------------------------------------------
 // Reusable Stat Card (Styled like StaffDashboard cards)
 // ---------------------------------------------------------------------
@@ -31,11 +31,11 @@ function StatCard({ icon, title, value }) {
     </div>
   );
 }
- 
+
 export default function FeedbackReport() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
- 
+
   useEffect(() => {
     async function load() {
       try {
@@ -49,7 +49,7 @@ export default function FeedbackReport() {
     }
     load();
   }, []);
- 
+
   if (loading) {
     return (
       <div className="text-center py-40 text-neutral-600 text-lg">
@@ -57,7 +57,7 @@ export default function FeedbackReport() {
       </div>
     );
   }
- 
+
   // -------------------------------
   // Calculations
   // -------------------------------
@@ -65,14 +65,14 @@ export default function FeedbackReport() {
     data.length > 0
       ? (data.reduce((a, b) => a + b.rating, 0) / data.length).toFixed(2)
       : 0;
- 
+
   const uniqueCustomers = new Set(data.map((d) => d.customerName)).size;
   const totalFeedbacks = data.length;
- 
+
   const ratingCounts = [1, 2, 3, 4, 5].map(
     (r) => data.filter((d) => d.rating === r).length
   );
- 
+
   const pieData = {
     labels: ["1 ★", "2 ★", "3 ★", "4 ★", "5 ★"],
     datasets: [
@@ -88,41 +88,38 @@ export default function FeedbackReport() {
       },
     ],
   };
- 
+
   return (
     <div className="min-h-screen bg-neutral-50 px-6 py-16 max-w-7xl mx-auto">
- 
       {/* PAGE HEADER */}
       <h1 className="text-3xl font-light text-neutral-900 mb-12 tracking-wide">
         Guest Feedback Report
       </h1>
- 
+
       {/* STATS */}
       <div className="grid md:grid-cols-3 gap-10 mb-14">
         <StatCard icon="⭐" title="Average Rating" value={avgRating} />
         <StatCard icon="🧍" title="Customers Reviewed" value={uniqueCustomers} />
         <StatCard icon="📝" title="Total Feedbacks" value={totalFeedbacks} />
       </div>
- 
+
       {/* CHART */}
       <section className="bg-white border border-neutral-200 p-10 rounded-md shadow-sm mb-14">
         <h2 className="text-xl font-light text-neutral-800 mb-6 tracking-wide">
           Rating Distribution
         </h2>
- 
         <div className="flex justify-center">
           <div className="w-72 h-72">
             <Pie data={pieData} />
           </div>
         </div>
       </section>
- 
+
       {/* FEEDBACK TABLE */}
       <section className="bg-white border border-neutral-200 p-10 rounded-md shadow-sm">
         <h2 className="text-xl font-light text-neutral-800 mb-8 tracking-wide">
           All Feedback
         </h2>
- 
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-neutral-600 text-xs uppercase tracking-wider border-b border-neutral-300">
@@ -132,7 +129,7 @@ export default function FeedbackReport() {
               <th className="py-3">Comment</th>
             </tr>
           </thead>
- 
+
           <tbody>
             {data.map((f) => (
               <tr key={f.feedbackId} className="border-b border-neutral-200 text-sm font-light">
@@ -145,7 +142,6 @@ export default function FeedbackReport() {
           </tbody>
         </table>
       </section>
- 
     </div>
   );
 }

@@ -60,6 +60,7 @@ import ManagerRoomStatusPage from "./pages/ManagerRoomStatusPage";
 import ManagerSupportTasksPage from "./pages/ManagerSupportTasksPage";
 import ManagerReportsPage from "./pages/ManagerReportsPage";
 import ManagerStaffTasksPage from "./pages/ManagerStaffTasksPage";
+import PaymentList from "./pages/reports/PaymentList";
 
 
 
@@ -74,7 +75,7 @@ export default function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/add-user" element={<AddUser />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/feedback" element={<FeedbackForm />} />
+                <Route path="/feedback/:id" element={<FeedbackForm />} />
                 <Route path="/gallery" element={<Gallery />} />
 
                 {/* Facility routes */}
@@ -125,6 +126,7 @@ export default function App() {
                 <Route path="/reports/feedback" element={<GuestFeedbackReport />} />
                 <Route path="/management/pricing" element={<RoomPricing />} />
                 <Route path="/management/branch" element={<HotelInformation />} />
+                <Route path="/payments" element={<PaymentList/>}/>
 
 
 
