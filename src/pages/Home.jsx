@@ -39,7 +39,7 @@ export default function Home() {
                 )}
                 {isStaff() && (
                   <button
-                    onClick={() => navigate("/staff-tasks")}
+                    onClick={() => navigate("/staff-dashboard")}
                     className="px-8 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"
                   >
                     My Tasks

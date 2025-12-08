@@ -11,23 +11,21 @@ import {
   Legend,
 } from "chart.js";
 
-import { Pie, Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-// -------- Card Component (Matches Revenue Report Style) --------
+// ---------------------------------------------------------------------
+// Reusable Stat Card (Styled like StaffDashboard cards)
+// ---------------------------------------------------------------------
 function StatCard({ icon, title, value }) {
   return (
-    <div
-      className="p-7 bg-white rounded-xl border border-blue-200 shadow-md
-                 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-    >
+    <div className="bg-white border border-neutral-200 p-8 rounded-md shadow-sm hover:shadow-md transition-all">
       <div className="flex items-center gap-4">
         <div className="text-4xl">{icon}</div>
-
         <div>
-          <h2 className="text-sm text-blue-600 uppercase tracking-widest">{title}</h2>
-          <p className="text-4xl font-semibold text-blue-900 mt-2">{value}</p>
+          <h2 className="text-xs uppercase tracking-wider text-neutral-500 mb-1">{title}</h2>
+          <p className="text-3xl font-light text-neutral-900">{value}</p>
         </div>
       </div>
     </div>
@@ -41,7 +39,7 @@ export default function FeedbackReport() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await axios.get("/api/feedback/admin/summary", { skipAuth: true });
+        const res = await axios.get("/api/feedback/admin/list", { skipAuth: true });
         setData(res.data);
       } catch (e) {
         console.error("Error loading feedback report:", e);
@@ -52,12 +50,17 @@ export default function FeedbackReport() {
     load();
   }, []);
 
-  if (loading)
-    return <p className="text-center mt-12 text-blue-700 animate-pulse">Loading feedback report…</p>;
+  if (loading) {
+    return (
+      <div className="text-center py-40 text-neutral-600 text-lg">
+        Loading feedback report...
+      </div>
+    );
+  }
 
-  // ---------------------------------------------
-  // 📊 Calculations
-  // ---------------------------------------------
+  // -------------------------------
+  // Calculations
+  // -------------------------------
   const avgRating =
     data.length > 0
       ? (data.reduce((a, b) => a + b.rating, 0) / data.length).toFixed(2)
@@ -66,21 +69,8 @@ export default function FeedbackReport() {
   const uniqueCustomers = new Set(data.map((d) => d.customerName)).size;
   const totalFeedbacks = data.length;
 
-  // Rating distribution data
   const ratingCounts = [1, 2, 3, 4, 5].map(
     (r) => data.filter((d) => d.rating === r).length
-  );
-
-  const branchMap = {};
-  data.forEach((d) => {
-    if (!branchMap[d.branchName]) branchMap[d.branchName] = { count: 0, sum: 0 };
-    branchMap[d.branchName].count++;
-    branchMap[d.branchName].sum += d.rating;
-  });
-
-  const branchLabels = Object.keys(branchMap);
-  const branchRatings = Object.values(branchMap).map((b) =>
-    (b.sum / b.count).toFixed(2)
   );
 
   const pieData = {
@@ -89,100 +79,72 @@ export default function FeedbackReport() {
       {
         data: ratingCounts,
         backgroundColor: [
-          "rgba(220,38,38,0.85)",
-          "rgba(251,146,60,0.85)",
-          "rgba(234,179,8,0.85)",
-          "rgba(59,130,246,0.85)",
-          "rgba(16,185,129,0.85)",
+          "rgba(220,38,38,0.8)",
+          "rgba(251,146,60,0.8)",
+          "rgba(234,179,8,0.8)",
+          "rgba(59,130,246,0.8)",
+          "rgba(16,185,129,0.8)",
         ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const barData = {
-    labels: branchLabels,
-    datasets: [
-      {
-        label: "Avg Rating",
-        data: branchRatings,
-        backgroundColor: "rgba(37,99,235,0.8)",
-        borderRadius: 8,
       },
     ],
   };
 
   return (
-    <div className="p-10">
+    <div className="min-h-screen bg-neutral-50 px-6 py-16 max-w-7xl mx-auto">
 
-      <h1 className="text-3xl font-extrabold text-black-900 mb-10">
+      {/* PAGE HEADER */}
+      <h1 className="text-3xl font-light text-neutral-900 mb-12 tracking-wide">
         Guest Feedback Report
       </h1>
 
-      {/* -------- RESTYLED CARDS -------- */}
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
-        <StatCard
-          icon="⭐"
-          title="Average Rating"
-          value={avgRating}
-        />
-
-        <StatCard
-          icon="🧍"
-          title="Customers Reviewed"
-          value={uniqueCustomers}
-        />
-
-        <StatCard
-          icon="📝"
-          title="Total Feedbacks"
-          value={totalFeedbacks}
-        />
+      {/* STATS */}
+      <div className="grid md:grid-cols-3 gap-10 mb-14">
+        <StatCard icon="⭐" title="Average Rating" value={avgRating} />
+        <StatCard icon="🧍" title="Customers Reviewed" value={uniqueCustomers} />
+        <StatCard icon="📝" title="Total Feedbacks" value={totalFeedbacks} />
       </div>
 
-      {/* -------- CHARTS -------- */}
-      <div className="grid md:grid-cols-2 gap-12 mb-16">
-        <div className="p-8 bg-white border border-blue-200 rounded-xl shadow-md">
-          <h2 className="text-blue-900 text-lg mb-4 font-bold">⭐ Rating Distribution</h2>
-          <Pie data={pieData} />
-        </div>
+      {/* CHART */}
+      <section className="bg-white border border-neutral-200 p-10 rounded-md shadow-sm mb-14">
+        <h2 className="text-xl font-light text-neutral-800 mb-6 tracking-wide">
+          Rating Distribution
+        </h2>
 
-        <div className="p-8 bg-white border border-blue-200 rounded-xl shadow-md">
-          <h2 className="text-blue-900 text-lg mb-4 font-bold">
-            🏨 Branch-wise Average Rating
-          </h2>
-          <Bar data={barData} />
+        <div className="flex justify-center">
+          <div className="w-72 h-72">
+            <Pie data={pieData} />
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* -------- TABLE -------- */}
-      <div className="bg-white border border-blue-200 rounded-xl shadow-md p-8">
-        <h2 className="text-blue-900 text-xl mb-6 font-bold">📄 All Feedbacks</h2>
+      {/* FEEDBACK TABLE */}
+      <section className="bg-white border border-neutral-200 p-10 rounded-md shadow-sm">
+        <h2 className="text-xl font-light text-neutral-800 mb-8 tracking-wide">
+          All Feedback
+        </h2>
 
         <table className="w-full border-collapse">
-          <thead className="bg-blue-100 text-blue-900 text-sm uppercase">
-            <tr>
-              <th className="p-3 border">Customer</th>
-              <th className="p-3 border">Branch</th>
-              <th className="p-3 border">Item</th>
-              <th className="p-3 border">Rating</th>
-              <th className="p-3 border">Comments</th>
+          <thead>
+            <tr className="text-left text-neutral-600 text-xs uppercase tracking-wider border-b border-neutral-300">
+              <th className="py-3">Customer</th>
+              <th className="py-3">Room / Facility</th>
+              <th className="py-3">Rating</th>
+              <th className="py-3">Comment</th>
             </tr>
           </thead>
 
           <tbody>
-            {data.map((f, i) => (
-              <tr key={i} className="text-center hover:bg-blue-50 transition">
-                <td className="p-3 border">{f.customerName}</td>
-                <td className="p-3 border">{f.branchName}</td>
-                <td className="p-3 border">{f.itemName}</td>
-                <td className="p-3 border text-lg">⭐ {f.rating}</td>
-                <td className="p-3 border text-sm text-neutral-700">{f.comments}</td>
+            {data.map((f) => (
+              <tr key={f.feedbackId} className="border-b border-neutral-200 text-sm font-light">
+                <td className="py-4">{f.customerName}</td>
+                <td className="py-4">{f.itemName}</td>
+                <td className="py-4">⭐ {f.rating}</td>
+                <td className="py-4 text-neutral-600">{f.comments}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </section>
 
     </div>
   );
