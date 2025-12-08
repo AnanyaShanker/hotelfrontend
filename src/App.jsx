@@ -7,7 +7,7 @@ import UsersList from "./components/users/UsersList";
 import AddUser from "./components/users/AddUser";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./components/auth/ForgotPassword";
-import PaymentList from "./pages/reports/PaymentList";
+//import PaymentList from "./pages/reports/PaymentList";
 import GalleryManagement from "./pages/admin/GalleryManagement";
 import Home from "./pages/Home";
 
