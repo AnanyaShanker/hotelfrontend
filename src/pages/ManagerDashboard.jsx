@@ -5,22 +5,25 @@ import { useAuth } from "../hooks/useAuth";
 
 export default function ManagerDashboard() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const [branch, setBranch] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
+  const token = localStorage.getItem("token");
 
+  // ---------------------------
+  // Fetch Manager's Branch
+  // ---------------------------
   useEffect(() => {
     if (!isAuthenticated || !isAdmin()) return;
 
     const fetchBranch = async () => {
       try {
-        const res = await axios.get(`/api/branches/manager/${user.userId}`);
+        const res = await axios.get(`/api/branches/manager/${user.userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBranch(res.data);
       } catch (err) {
         console.error("Failed to load branch:", err);
@@ -30,6 +33,15 @@ export default function ManagerDashboard() {
 
     fetchBranch();
   }, [user]);
+
+  // ---------------------------
+  // Logout
+  // ---------------------------
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
 
   if (!isAuthenticated || !isAdmin()) {
     return (
@@ -41,85 +53,111 @@ export default function ManagerDashboard() {
 
   if (loading) {
     return (
-      <div className="mt-40 text-center text-neutral-700">
-        <p>Loading your branch dashboard...</p>
+      <div className="text-center py-40 text-neutral-600 text-lg">
+        Loading your branch information...
       </div>
     );
   }
 
   return (
-    <>
-      {/* LOGOUT BUTTON floating top-right */}
-      <button
-        onClick={handleLogout}
-        className="fixed top-4 right-4 z-50 text-neutral-700 hover:text-neutral-900 font-semibold text-lg tracking-wide uppercase px-6 py-3 transition-transform duration-200 hover:scale-105"
-      >
-        Logout
-      </button>
-
-      {/* MAIN CONTENT with equal margin */}
-      <div className="m-8">
-        {/* HEADER */}
-        <section className="mb-16">
-          <div className="relative overflow-hidden bg-neutral-50 border border-neutral-200 p-10 rounded-md shadow-sm">
-            <h2 className="text-3xl font-light text-neutral-800 mb-3 tracking-wide">
-              Manager Dashboard — {branch?.name}
-            </h2>
-            <p className="text-neutral-600 text-base font-light max-w-2xl">
-              Manage operations, staff, rooms, and performance reports for your branch.
-            </p>
+    <div className="min-h-screen bg-neutral-50">
+      {/* -------------------------------------- */}
+      {/* NAVBAR (Same as StaffDashboard) */}
+      {/* -------------------------------------- */}
+      <header className="border-b border-neutral-200 fixed top-0 left-0 w-full bg-white z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+          <div className="text-xl tracking-wide font-light text-neutral-900 cursor-pointer">
+            HOTELEASE
           </div>
-        </section>
 
-        {/* MAIN GRID */}
-        <section className="grid md:grid-cols-3 gap-10">
+          {/* PROFILE DROPDOWN */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center gap-3 border border-neutral-300 px-4 py-2 text-neutral-700 font-light hover:bg-neutral-100 transition"
+            >
+              <div className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center text-neutral-700">
+                {user?.name?.charAt(0) || "M"}
+              </div>
+              <span className="text-sm">{user?.name}</span>
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 shadow-lg p-4 animate-fade-in">
+                <div className="text-neutral-900 font-light mb-1">{user?.name}</div>
+                <div className="text-neutral-500 text-xs uppercase tracking-wider mb-4">
+                  Manager
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left text-sm text-neutral-800 py-2 hover:text-neutral-600"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* -------------------------------------- */}
+      {/* MAIN CONTENT */}
+      {/* -------------------------------------- */}
+      <main className="max-w-6xl mx-auto pt-32 px-6">
+        {/* HEADER */}
+        <h1 className="text-3xl font-light text-neutral-900 mb-8 tracking-wide">
+          Manager Dashboard — {branch?.name}
+        </h1>
+
+        {/* GRID OF PANELS (Same style as staff dashboard section cards) */}
+        <section className="grid md:grid-cols-2 gap-10">
+
           <DashboardCard
             title="🛏️ Branch Bookings"
-            desc="View and manage all room bookings for this branch."
-            action={() => navigate(`/manager/bookings?branchId=${branch.branchId}`)}
+            desc="View and manage all guest bookings for this branch."
             btn="View Bookings"
+            action={() => navigate(`/manager/bookings?branchId=${branch.branchId}`)}
           />
 
           <DashboardCard
             title="🚪 Room Status"
-            desc="Update availability and maintenance status of all rooms."
-            action={() => navigate(`/manager/room-status?branchId=${branch.branchId}`)}
+            desc="Update availability and maintenance status for rooms."
             btn="Manage Rooms"
+            action={() => navigate(`/manager/room-status?branchId=${branch.branchId}`)}
           />
 
           <DashboardCard
             title="🎫 Support Tickets"
-            desc="Monitor support tickets raised by guests and assign staff."
-            action={() => navigate(`/manager/support-tickets?branchId=${branch.branchId}`)}
+            desc="Monitor and respond to guest support tickets."
             btn="View Tickets"
+            action={() => navigate(`/manager/support-tickets?branchId=${branch.branchId}`)}
           />
 
           <DashboardCard
             title="📋 Staff Tasks"
-            desc="View housekeeping & operational tasks."
+            desc="View all housekeeping and staff tasks."
+            btn="View Staff Tasks"
             action={() => navigate(`/manager/staff-tasks?branchId=${branch.branchId}`)}
-            btn="View Assigned Tasks"
           />
 
-          <DashboardCard
-            title="📊 Branch Reports"
-            desc="View revenue, occupancy, feedback and housekeeping reports."
-            action={() =>
-              navigate(`/manager/reports?branchId=${branch.branchId}&managerId=${user.userId}`)
-            }
-            btn="View Reports"
-          />
         </section>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
 
-function DashboardCard({ title, desc, action, btn }) {
+// ------------------------------------------------------
+// REUSABLE DASHBOARD CARD (Same style as StaffDashboard)
+// ------------------------------------------------------
+function DashboardCard({ title, desc, btn, action }) {
   return (
-    <div className="bg-neutral-50 border border-neutral-200 p-8 hover:border-neutral-300 transition-all rounded-md shadow-sm">
-      <h3 className="text-xl font-light mb-4 text-neutral-900 tracking-wide">{title}</h3>
+    <div className="bg-white border border-neutral-200 p-8 rounded-md shadow-sm hover:shadow-md transition-all">
+      <h3 className="text-xl font-light mb-4 text-neutral-900 tracking-wide">
+        {title}
+      </h3>
       <p className="text-neutral-700 font-light text-sm mb-6">{desc}</p>
+
       <button
         onClick={action}
         className="px-6 py-3 bg-neutral-800 text-white font-light text-sm tracking-wider uppercase hover:bg-neutral-900 transition"

@@ -19,7 +19,7 @@ export default function RoleAwareNavbar() {
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -68,6 +68,7 @@ export default function RoleAwareNavbar() {
               >
                 My Bookings
               </a>
+              
               <a
                 href="/my-payments"
                 className={`hover:text-neutral-400 transition-colors ${scrolled ? 'text-neutral-800' : 'text-white'}`}
@@ -154,16 +155,7 @@ export default function RoleAwareNavbar() {
                     <p className="text-xs text-neutral-500 mt-1">{getRoleName(user?.roleId)}</p>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      navigate("/profile");
-                      setShowUserMenu(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
-                  >
-                    Profile
-                  </button>
-
+                  
                   {isCustomer() && (
                     <button
                       onClick={() => {
@@ -173,6 +165,17 @@ export default function RoleAwareNavbar() {
                       className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
                     >
                       Bookings
+                    </button>
+                  )}
+                  {isCustomer() && (
+                    <button
+                      onClick={() => {
+                        navigate("/my-tickets");
+                        setShowUserMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"
+                    >
+                      Raised Tickets
                     </button>
                   )}
                   {isAdmin() && (
@@ -191,7 +194,7 @@ export default function RoleAwareNavbar() {
                   {isStaff() && (
                     <button
                       onClick={() => {
-                        navigate("/staff-tasks");
+                        navigate("/staff-dashboard");
                         setShowUserMenu(false);
                       }}
                       className="w-full text-left px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 transition font-light uppercase tracking-wider"

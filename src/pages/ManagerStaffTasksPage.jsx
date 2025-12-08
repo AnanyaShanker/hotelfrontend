@@ -82,10 +82,10 @@ export default function ManagerStaffTaskPage() {
          <BackButton />
       <section className="mb-10">
         <h1 className="text-3xl font-light text-neutral-800">
-          Staff Tasks — Branch #{branchId}
+          Staff Tasks 
         </h1>
         <p className="text-neutral-600 mt-2">
-          View and monitor all staff tasks for your branch.
+          View and monitor all staff tasks 
         </p>
       </section>
 
